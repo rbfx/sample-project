@@ -1,0 +1,6 @@
+# Ignore generated projects
+build/
+.vscode/
+
+# Ignore log files
+Urho3D.log

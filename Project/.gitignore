@@ -1,0 +1,16 @@
+# Ignore asset cache
+/Cache/
+/Cache.json
+
+# Ignore temporary files
+/Temp/
+
+# Ignore UI settings
+/ui.ini
+
+# Ignore preview screenshot
+/Preview.png
+
+# Ignore internal files
+*.user.json
+
