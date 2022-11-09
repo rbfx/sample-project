@@ -8,6 +8,8 @@ TODO: Write me.
 
 Checkout and build this project like any other CMake project.
 
+See `Scripts/` for some helper scripts.
+
 ## Running the Sample
 
 Run Editor:

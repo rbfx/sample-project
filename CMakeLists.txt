@@ -44,3 +44,23 @@ add_subdirectory (${CMAKE_SOURCE_DIR}/Source)
 # Add custom player and editor with injected plugins.
 add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Player)
 add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Editor)
+
+# Package resources from Project directory.
+if (WEB OR MOBILE)
+    create_pak("${CMAKE_SOURCE_DIR}/Project/Data"     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak")
+    create_pak("${CMAKE_SOURCE_DIR}/Project/CoreData" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak")
+endif ()
+
+# Link resources to Player for Web.
+if (WEB)
+    web_executable (Player)
+    package_resources_web(
+        FILES        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak"
+                     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak"
+        RELATIVE_DIR "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+        OUTPUT       "Resources.js"
+        INSTALL_TO   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
+    )
+    web_link_resources(Player Resources.js)
+    target_link_libraries(Player PRIVATE "--shell-file ${CMAKE_SOURCE_DIR}/3rdParty/rbfx/bin/shell.html")
+endif ()
