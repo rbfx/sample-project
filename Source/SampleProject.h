@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Urho3D/Engine/StateManager.h>
 #include <Urho3D/Graphics/Viewport.h>
 #include <Urho3D/Plugins/PluginApplication.h>
 #include <Urho3D/Scene/LogicComponent.h>
@@ -27,6 +28,25 @@ private:
     float jumpCooldown_{};
 };
 
+/// Screen with actual game.
+class SampleGameScreen : public ApplicationState
+{
+    URHO3D_OBJECT(SampleGameScreen, ApplicationState);
+
+public:
+    explicit SampleGameScreen(Context* context);
+
+    /// Implement ApplicationState.
+    /// @{
+    void Activate(StringVariantMap& bundle) override;
+    void Deactivate() override;
+    /// @}
+
+private:
+    /// Main scene of the game.
+    SharedPtr<Scene> scene_;
+};
+
 /// Main class that hosts the application.
 class SampleProject : public MainPluginApplication
 {
@@ -45,8 +65,6 @@ public:
     void Unload() override;
 
 private:
-    /// Main scene of the game.
-    SharedPtr<Scene> scene_;
-    /// Main viewport of the game.
-    SharedPtr<Viewport> viewport_;
+    /// Screen with actual game.
+    SharedPtr<SampleGameScreen> gameScreen_;
 };

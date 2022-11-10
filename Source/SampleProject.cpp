@@ -84,25 +84,18 @@ void PlayerController::FixedUpdate(float timeStep)
     }
 }
 
-SampleProject::SampleProject(Context* context)
-    : MainPluginApplication(context)
-{
-    RegisterObject<PlayerController>();
-}
-
-void SampleProject::Load()
+SampleGameScreen::SampleGameScreen(Context* context)
+    : ApplicationState(context)
 {
 }
 
-void SampleProject::Unload()
+void SampleGameScreen::Activate(StringVariantMap& bundle)
 {
-}
+    BaseClassName::Activate(bundle);
 
-void SampleProject::Start(bool isMain)
-{
-    auto cache = GetSubsystem<ResourceCache>();
-    auto engine = GetSubsystem<Engine>();
-    auto renderer = GetSubsystem<Renderer>();
+    // Setup mouse.
+    SetMouseMode(MM_RELATIVE);
+    SetMouseVisible(false);
 
     // Load scene.
     scene_ = MakeShared<Scene>(context_);
@@ -124,25 +117,58 @@ void SampleProject::Start(bool isMain)
     controller->SetAcceleratedSpeed(0.0f);
 
     // Create viewport.
-    viewport_ = MakeShared<Viewport>(context_, scene_, camera);
-    renderer->SetNumViewports(1);
-    renderer->SetViewport(0, viewport_);
+    auto viewport = MakeShared<Viewport>(context_, scene_, camera);
+    SetViewport(0, viewport);
 
     // Warp camera to current position in Editor, if applicable.
-    if (const auto position = engine->GetParameter(Param_ScenePosition); !position.IsEmpty())
+    if (const auto position = bundle[Param_ScenePosition]; !position.IsEmpty())
         actorNode->SetWorldPosition(position.GetVector3() - cameraNode->GetPosition());
 
-    if (const auto rotation = engine->GetParameter(Param_SceneRotation); !rotation.IsEmpty())
+    if (const auto rotation = bundle[Param_SceneRotation]; !rotation.IsEmpty())
         cameraNode->SetWorldRotation(rotation.GetQuaternion());
+}
+
+void SampleGameScreen::Deactivate()
+{
+    BaseClassName::Deactivate();
+
+    // Release scene.
+    scene_ = nullptr;
+}
+
+SampleProject::SampleProject(Context* context)
+    : MainPluginApplication(context)
+{
+    RegisterObject<PlayerController>();
+}
+
+void SampleProject::Load()
+{
+}
+
+void SampleProject::Unload()
+{
+}
+
+void SampleProject::Start(bool isMain)
+{
+    auto engine = GetSubsystem<Engine>();
+    auto stateManager = GetSubsystem<StateManager>();
+
+    // TODO: Use this to check whether to show menu or not.
+    const bool fromEditor = !engine->GetParameter(Param_SceneName).IsEmpty();
+
+    // Allocate game screen.
+    gameScreen_ = MakeShared<SampleGameScreen>(context_);
+
+    // Activate game screen.
+    StringVariantMap bundle;
+    bundle[Param_ScenePosition] = engine->GetParameter(Param_ScenePosition);
+    bundle[Param_SceneRotation] = engine->GetParameter(Param_SceneRotation);
+    stateManager->EnqueueState(gameScreen_, bundle);
+    stateManager->Update(0.001f);
 }
 
 void SampleProject::Stop()
 {
-    // Unset viewport.
-    auto renderer = GetSubsystem<Renderer>();
-    renderer->SetNumViewports(0);
-
-    // Release viewport and scene.
-    viewport_ = nullptr;
-    scene_ = nullptr;
 }
