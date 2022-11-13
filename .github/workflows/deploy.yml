@@ -1,0 +1,72 @@
+name: Deploy
+on:
+  push:
+    branches-ignore:
+      - 'no-ci-**'
+      - 'skip-ci-**'
+  pull_request:
+
+env:
+  # common settings
+  CMAKE_VERSION: 3.21.x
+  # paths
+  ci_source_dir: ${{ github.workspace }}/source-code
+  ci_build_script: ./source-code/Script/ci_build.sh
+  ci_build_dir: ${{ github.workspace }}/cmake-build
+  ci_sdk_dir: ${{ github.workspace }}/SDK
+
+jobs:
+  Web:
+    if: github.event.pull_request.draft == false
+    runs-on: ubuntu-20.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ci_emsdk_version:
+          #- latest
+          - 3.1.24  # Minimal supported
+
+    env:
+      BINARYEN_CORES: 1
+
+    steps:
+      - uses: mymindstorm/setup-emsdk@v11
+        with:
+          version: ${{ matrix.ci_emsdk_version }}
+
+      - uses: actions/checkout@v2
+        with:
+          path: ${{ env.ci_source_dir }}
+          fetch-depth: 1
+          submodules: true
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.8
+        with:
+          cmake-version: '${{ env.CMAKE_VERSION }}'
+
+      - name: Dependencies
+        shell: bash
+        run: ${{ env.ci_build_script }} dependencies
+
+      - name: Generate
+        shell: bash
+        run: ${{ env.ci_build_script }} generate
+
+      - name: Build
+        shell: bash
+        run: ${{ env.ci_build_script }} build
+
+      - name: Prepare
+        shell: bash
+        run: ${{ env.ci_build_script }} prepare
+
+      - name: Publish
+        uses: KikimoraGames/itch-publish@v0.0.3
+        with:
+          butlerAPIKey: ${{ secrets.BUTLER_API_KEY }}
+          gameData: ${{ github.workspace }}/cmake-build/bin/project
+          itchUsername: eugeneko
+          itchGameId: sample-project
+          buildChannel: web
