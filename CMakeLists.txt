@@ -14,6 +14,7 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set (URHO3D_MONOLITHIC_HEADER ON CACHE BOOL "")
 
 # Disable unused features to speed up build
+set (URHO3D_CSHARP OFF CACHE BOOL "")
 set (URHO3D_GLOW OFF CACHE BOOL "")
 set (URHO3D_IK OFF CACHE BOOL "")
 set (URHO3D_NETWORK OFF CACHE BOOL "")
@@ -33,7 +34,7 @@ set (URHO3D_EDITOR OFF CACHE BOOL "")
 set (URHO3D_PLUGIN_LIST "SampleProject" CACHE BOOL "")
 
 # Include common build scripts.
-include (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/cmake/Modules/UrhoCommon.cmake)
+include (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/CMake/Modules/UrhoCommon.cmake)
 
 # Include the Framework.
 add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx)

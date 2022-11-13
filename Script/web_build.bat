@@ -1,4 +1,4 @@
 pushd ..\..\sample-project-web
 del bin\*.pak
-cmake --build . --config Debug -j12
+cmake --build . -j8
 popd
