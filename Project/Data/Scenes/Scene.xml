@@ -67,9 +67,9 @@
 				<attribute name="Color" value="1 0.925714 0.257143 1" />
 				<attribute name="Brightness Multiplier" value="0.300000" />
 				<attribute name="Cast Shadows" value="true" />
-				<attribute name="Shadow Distance" value="50.000000" />
-				<attribute name="Shadow Fade Distance" value="30.000000" />
-				<attribute name="CSM Splits" value="50 0 0 0" />
+				<attribute name="Shadow Distance" value="20.000000" />
+				<attribute name="Shadow Fade Distance" value="15.000000" />
+				<attribute name="CSM Splits" value="20 0 0 0" />
 			</component>
 		</node>
 	</node>
