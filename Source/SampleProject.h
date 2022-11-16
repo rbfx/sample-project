@@ -5,6 +5,7 @@
 #include <Urho3D/Plugins/PluginApplication.h>
 #include <Urho3D/Scene/LogicComponent.h>
 #include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/SplashScreen.h>
 
 using namespace Urho3D;
 
@@ -65,6 +66,8 @@ public:
     void Unload() override;
 
 private:
+    /// Loading screen.
+    SharedPtr<SplashScreen> loadingScreen_;
     /// Screen with actual game.
     SharedPtr<SampleGameScreen> gameScreen_;
 };
