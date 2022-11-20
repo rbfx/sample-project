@@ -165,7 +165,6 @@ void SampleProject::Start(bool isMain)
         stateManager->SetFadeInDuration(1.0f);
         stateManager->SetFadeOutDuration(1.0f);
         loadingScreen_ = MakeShared<SplashScreen>(context_);
-        // TODO: fix bug with background resource loading
         loadingScreen_->QueueSceneResourcesAsync("Scenes/Scene.xml");
         loadingScreen_->SetProgressColor(Color::WHITE);
         loadingScreen_->SetDefaultFogColor(Color::GRAY);
