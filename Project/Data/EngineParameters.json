@@ -1,0 +1,29 @@
+{
+    "Default": [
+        {
+            "Flavor": [
+                {
+                    "key": "*",
+                    "value": ["*"]
+                }
+            ],
+            "Variables": [
+                {
+                    "key": "Borderless",
+                    "type": "Bool",
+                    "value": true
+                },
+                {
+                    "key": "Plugins",
+                    "type": "String",
+                    "value": "SampleProject"
+                },
+                {
+                    "key": "MainPlugin",
+                    "type": "String",
+                    "value": "SampleProject"
+                }
+            ]
+        }
+    ]
+}

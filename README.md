@@ -26,6 +26,6 @@ Run Editor:
 
 Run Player:
 
-Launch `Player.exe --pp path/to/sample-project/Project --plugins SampleProject --main SampleProject`
+Launch `Player.exe --pp path/to/sample-project/Project`
 
 ![](/screenshot.png)
