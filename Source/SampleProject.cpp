@@ -22,13 +22,16 @@
 
 #include "SampleProject.h"
 
+#include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/IO/VirtualFileSystem.h>
 #include <Urho3D/Input/FreeFlyController.h>
 #include <Urho3D/Input/Input.h>
 #include <Urho3D/Physics/KinematicCharacterController.h>
+#include <Urho3D/Resource/JSONFile.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
 
@@ -84,6 +87,12 @@ void PlayerController::FixedUpdate(float timeStep)
     }
 }
 
+void GameSaveData::SerializeInBlock(Archive& archive)
+{
+    SerializeValue(archive, "actorPosition", actorPosition_);
+    SerializeValue(archive, "actorRotation", actorRotation_);
+}
+
 SampleGameScreen::SampleGameScreen(Context* context)
     : ApplicationState(context)
 {
@@ -102,17 +111,17 @@ void SampleGameScreen::Activate(StringVariantMap& bundle)
     scene_->LoadFile("Scenes/Scene.xml");
 
     // Find camera.
-    Node* actorNode = scene_->FindChild("Actor");
-    Camera* camera = actorNode ? actorNode->GetComponent<Camera>(true) : nullptr;
+    actorNode_ = scene_->FindChild("Actor");
+    Camera* camera = actorNode_ ? actorNode_->GetComponent<Camera>(true) : nullptr;
     if (!camera)
         return;
-    Node* cameraNode = camera->GetNode();
+    cameraNode_ = camera->GetNode();
 
     // Create player component now to prevent it from moving in Editor.
-    auto player = actorNode->CreateComponent<PlayerController>();
+    auto player = actorNode_->CreateComponent<PlayerController>();
 
     // Create free-fly controller with zero speed to control motion with physics.
-    auto controller = cameraNode->CreateComponent<FreeFlyController>();
+    auto controller = cameraNode_->CreateComponent<FreeFlyController>();
     controller->SetSpeed(0.0f);
     controller->SetAcceleratedSpeed(0.0f);
 
@@ -122,10 +131,23 @@ void SampleGameScreen::Activate(StringVariantMap& bundle)
 
     // Warp camera to current position in Editor, if applicable.
     if (const auto position = bundle[Param_ScenePosition]; !position.IsEmpty())
-        actorNode->SetWorldPosition(position.GetVector3() - cameraNode->GetPosition());
+        actorNode_->SetWorldPosition(position.GetVector3() - cameraNode_->GetPosition());
 
     if (const auto rotation = bundle[Param_SceneRotation]; !rotation.IsEmpty())
-        cameraNode->SetWorldRotation(rotation.GetQuaternion());
+        cameraNode_->SetWorldRotation(rotation.GetQuaternion());
+
+    LoadGame();
+}
+
+void SampleGameScreen::Update(float timeStep)
+{
+    const float autoSaveInterval = 5.0f;
+    autosaveTimer_ += timeStep;
+    if (autosaveTimer_ >= autoSaveInterval)
+    {
+        autosaveTimer_ = 0.0f;
+        SaveGame();
+    }
 }
 
 void SampleGameScreen::Deactivate()
@@ -134,6 +156,49 @@ void SampleGameScreen::Deactivate()
 
     // Release scene.
     scene_ = nullptr;
+    actorNode_ = nullptr;
+    cameraNode_ = nullptr;
+}
+
+void SampleGameScreen::SaveGame()
+{
+    if (GetPlatform() != PlatformId::Web || !scene_)
+        return;
+
+    GameSaveData saveGame;
+    saveGame.actorPosition_ = actorNode_->GetWorldPosition();
+    saveGame.actorRotation_ = cameraNode_->GetWorldRotation();
+
+    JSONFile jsonFile(context_);
+    jsonFile.SaveObject("saveGameData", saveGame);
+
+    // TODO: Get rid of VirtualFileSystem.
+    auto vfs = GetSubsystem<VirtualFileSystem>();
+    auto file = vfs->OpenFile(FileIdentifier("conf://Saves/actor.json"), FILE_WRITE);
+    if (file)
+        jsonFile.Save(*file);
+}
+
+void SampleGameScreen::LoadGame()
+{
+    if (GetPlatform() != PlatformId::Web || !scene_)
+        return;
+
+    // TODO: Get rid of VirtualFileSystem.
+    auto vfs = GetSubsystem<VirtualFileSystem>();
+    auto file = vfs->OpenFile(FileIdentifier("conf://Saves/actor.json"), FILE_READ);
+    if (!file)
+        return;
+
+    JSONFile jsonFile(context_);
+    if (!jsonFile.Load(*file))
+        return;
+
+    GameSaveData saveGame;
+    jsonFile.LoadObject("saveGameData", saveGame);
+
+    actorNode_->SetWorldPosition(saveGame.actorPosition_);
+    cameraNode_->SetWorldRotation(saveGame.actorRotation_);
 }
 
 SampleProject::SampleProject(Context* context)

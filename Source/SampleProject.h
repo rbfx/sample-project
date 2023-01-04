@@ -28,6 +28,15 @@ private:
     float jumpCooldown_{};
 };
 
+/// Save file.
+struct GameSaveData
+{
+    Vector3 actorPosition_;
+    Quaternion actorRotation_;
+
+    void SerializeInBlock(Archive& archive);
+};
+
 /// Screen with actual game.
 class SampleGameScreen : public ApplicationState
 {
@@ -39,12 +48,25 @@ public:
     /// Implement ApplicationState.
     /// @{
     void Activate(StringVariantMap& bundle) override;
+    void Update(float timeStep) override;
     void Deactivate() override;
     /// @}
 
 private:
+    /// Save game.
+    void SaveGame();
+    /// Load game.
+    void LoadGame();
+
     /// Main scene of the game.
     SharedPtr<Scene> scene_;
+
+    /// Actor and camera nodes.
+    SharedPtr<Node> actorNode_;
+    SharedPtr<Node> cameraNode_;
+
+    /// Autosave timer.
+    float autosaveTimer_{};
 };
 
 /// Main class that hosts the application.
