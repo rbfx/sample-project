@@ -9,11 +9,6 @@
             ],
             "Variables": [
                 {
-                    "key": "Borderless",
-                    "type": "Bool",
-                    "value": true
-                },
-                {
                     "key": "Plugins",
                     "type": "String",
                     "value": "SampleProject"
