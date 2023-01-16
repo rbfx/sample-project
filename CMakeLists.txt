@@ -23,6 +23,9 @@ set (URHO3D_PHYSICS2D OFF CACHE BOOL "")
 set (URHO3D_SAMPLES OFF CACHE BOOL "")
 set (URHO3D_PROFILING OFF CACHE BOOL "")
 set (URHO3D_TESTING OFF CACHE BOOL "")
+if (WIN32)
+    set(URHO3D_WIN32_CONSOLE ON)
+endif ()
 
 # Disable default Player and Editor to inject static plugins later.
 # Dynamically linked builds don't need it since default Player and Editor can load *.dll/*.so just fine.

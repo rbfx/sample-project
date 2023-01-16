@@ -27,6 +27,7 @@
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Graphics/Camera.h>
 #include <Urho3D/Graphics/Renderer.h>
+#include <Urho3D/Graphics/Texture2D.h>
 #include <Urho3D/IO/VirtualFileSystem.h>
 #include <Urho3D/Input/FreeFlyController.h>
 #include <Urho3D/Input/Input.h>
@@ -34,6 +35,7 @@
 #include <Urho3D/Resource/JSONFile.h>
 #include <Urho3D/Resource/ResourceCache.h>
 #include <Urho3D/Scene/Scene.h>
+#include <Urho3D/UI/SplashScreen.h>
 
 URHO3D_DEFINE_PLUGIN_MAIN(SampleProject);
 
@@ -223,6 +225,18 @@ void SampleProject::Start(bool isMain)
     // TODO: Use this to check whether to show menu or not.
     const bool fromEditor = !engine->GetParameter(Param_SceneName).IsEmpty();
 
+    if (!fromEditor)
+    {
+        stateManager->SetFadeInDuration(1.0f);
+        stateManager->SetFadeOutDuration(1.0f);
+        loadingScreen_ = MakeShared<SplashScreen>(context_);
+        loadingScreen_->QueueSceneResourcesAsync("Scenes/Scene.xml");
+        loadingScreen_->SetProgressColor(Color::WHITE);
+        loadingScreen_->SetDefaultFogColor(Color::GRAY);
+        loadingScreen_->SetBackgroundImage(GetSubsystem<ResourceCache>()->GetResource<Texture2D>("Images/SplashScreen.jpg"));
+        stateManager->EnqueueState(loadingScreen_);
+    }
+
     // Allocate game screen.
     gameScreen_ = MakeShared<SampleGameScreen>(context_);
 
@@ -231,7 +245,7 @@ void SampleProject::Start(bool isMain)
     bundle[Param_ScenePosition] = engine->GetParameter(Param_ScenePosition);
     bundle[Param_SceneRotation] = engine->GetParameter(Param_SceneRotation);
     stateManager->EnqueueState(gameScreen_, bundle);
-    stateManager->Update(0.001f);
+    //stateManager->Update(0.001f);
 }
 
 void SampleProject::Stop()
