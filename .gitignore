@@ -1,3 +1,6 @@
+# CMake generated build files
+/cmake-build-*/
+
 # Ignore generated projects
 build/
 .vscode/
