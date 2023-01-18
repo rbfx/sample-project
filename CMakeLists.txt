@@ -34,7 +34,7 @@ set (URHO3D_PLAYER OFF CACHE BOOL "")
 set (URHO3D_EDITOR OFF CACHE BOOL "")
 
 # Link "SampleProject" plugin to Player and Editor.
-set (URHO3D_PLUGIN_LIST "SampleProject" CACHE BOOL "")
+set (URHO3D_PLUGIN_LIST ${CMAKE_PROJECT_NAME} CACHE BOOL "")
 
 # Include common build scripts.
 include (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/CMake/Modules/UrhoCommon.cmake)
@@ -44,6 +44,9 @@ add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx)
 
 # Add project source files.
 add_subdirectory (${CMAKE_SOURCE_DIR}/Source)
+
+# Add launcher source files.
+add_subdirectory (${CMAKE_SOURCE_DIR}/Launcher)
 
 # Add custom player and editor with injected plugins.
 add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Player)
