@@ -58,6 +58,8 @@ private:
     void SaveGame();
     /// Load game.
     void LoadGame();
+    /// Handle key down
+    void HandleKeyDown(StringHash eventType, VariantMap& eventData);
 
     /// Main scene of the game.
     SharedPtr<Scene> scene_;

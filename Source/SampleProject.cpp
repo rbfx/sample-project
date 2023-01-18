@@ -98,6 +98,7 @@ void GameSaveData::SerializeInBlock(Archive& archive)
 SampleGameScreen::SampleGameScreen(Context* context)
     : ApplicationState(context)
 {
+    SubscribeToEvent(Urho3D::E_KEYDOWN, URHO3D_HANDLER(SampleGameScreen, HandleKeyDown));
 }
 
 void SampleGameScreen::Activate(StringVariantMap& bundle)
@@ -201,6 +202,15 @@ void SampleGameScreen::LoadGame()
 
     actorNode_->SetWorldPosition(saveGame.actorPosition_);
     cameraNode_->SetWorldRotation(saveGame.actorRotation_);
+}
+
+void SampleGameScreen::HandleKeyDown(StringHash eventType, VariantMap& eventData)
+{
+    const auto key = static_cast<Key>(eventData[KeyDown::P_KEY].GetUInt());
+    if (key == KEY_ESCAPE)
+    {
+        context_->GetSubsystem<Engine>()->Exit();
+    }
 }
 
 SampleProject::SampleProject(Context* context)
