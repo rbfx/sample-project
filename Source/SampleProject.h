@@ -3,74 +3,11 @@
 #include <Urho3D/Engine/StateManager.h>
 #include <Urho3D/Graphics/Viewport.h>
 #include <Urho3D/Plugins/PluginApplication.h>
-#include <Urho3D/Scene/LogicComponent.h>
 #include <Urho3D/Scene/Scene.h>
-#include <Urho3D/UI/SplashScreen.h>
+#include "SampleGameScreen.h"
+#include "MenuGameScreen.h"
 
 using namespace Urho3D;
-
-URHO3D_GLOBAL_CONSTANT(ConstString Category_SampleProject{"Component/SampleProject"});
-
-/// Player controller class.
-class PlayerController : public LogicComponent
-{
-    URHO3D_OBJECT(PlayerController, LogicComponent);
-
-public:
-    explicit PlayerController(Context* context);
-
-    /// Register object factory and attributes.
-    static void RegisterObject(Context* context);
-
-    void FixedUpdate(float timeStep) override;
-
-private:
-    float jumpInterval_{0.3f};
-    float jumpCooldown_{};
-};
-
-/// Save file.
-struct GameSaveData
-{
-    Vector3 actorPosition_;
-    Quaternion actorRotation_;
-
-    void SerializeInBlock(Archive& archive);
-};
-
-/// Screen with actual game.
-class SampleGameScreen : public ApplicationState
-{
-    URHO3D_OBJECT(SampleGameScreen, ApplicationState);
-
-public:
-    explicit SampleGameScreen(Context* context);
-
-    /// Implement ApplicationState.
-    /// @{
-    void Activate(StringVariantMap& bundle) override;
-    void Update(float timeStep) override;
-    void Deactivate() override;
-    /// @}
-
-private:
-    /// Save game.
-    void SaveGame();
-    /// Load game.
-    void LoadGame();
-    /// Handle key down
-    void HandleKeyDown(StringHash eventType, VariantMap& eventData);
-
-    /// Main scene of the game.
-    SharedPtr<Scene> scene_;
-
-    /// Actor and camera nodes.
-    SharedPtr<Node> actorNode_;
-    SharedPtr<Node> cameraNode_;
-
-    /// Autosave timer.
-    float autosaveTimer_{};
-};
 
 /// Main class that hosts the application.
 class SampleProject : public MainPluginApplication
@@ -89,9 +26,20 @@ public:
     /// Deinitialize plugin.
     void Unload() override;
 
+    /// Open main menu.
+    void OpenMenu();
+    /// Starting new game.
+    void NewGame();
+    /// Continue current game.
+    void ContinueGame();
+    /// Is game played.
+    bool IsGamePlayed() const { return gameScreen_ != nullptr; }
+
 private:
     /// Loading screen.
     SharedPtr<SplashScreen> loadingScreen_;
     /// Screen with actual game.
     SharedPtr<SampleGameScreen> gameScreen_;
+    /// Screen with actual game.
+    SharedPtr<MenuGameScreen> menuScreen_;
 };

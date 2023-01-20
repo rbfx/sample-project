@@ -33,7 +33,7 @@ endif ()
 set (URHO3D_PLAYER OFF CACHE BOOL "")
 set (URHO3D_EDITOR OFF CACHE BOOL "")
 
-# Link "SampleProject" plugin to Player and Editor.
+# Link project plugin to Player and Editor.
 set (URHO3D_PLUGIN_LIST ${CMAKE_PROJECT_NAME} CACHE BOOL "")
 
 # Include common build scripts.
