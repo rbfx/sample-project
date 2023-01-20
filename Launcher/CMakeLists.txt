@@ -9,7 +9,7 @@ endif()
 # Add launcher.
 set (TARGET_NAME "${CMAKE_PROJECT_NAME}Launcher")
 add_executable(${TARGET_NAME} ${SOURCE_FILES})
-target_link_libraries (${TARGET_NAME} PRIVATE Urho3D Player_StaticPlugins "${CMAKE_PROJECT_NAME}")
+target_link_libraries (${TARGET_NAME} PRIVATE Urho3D "${CMAKE_PROJECT_NAME}")
 
 if(MSVC)
     set_target_properties(${TARGET_NAME}
