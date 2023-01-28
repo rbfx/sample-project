@@ -20,15 +20,15 @@ function action-dependencies() {
 
 function action-generate() {
     cmake \
-        -G Ninja                                                                \
-        -DCMAKE_TOOLCHAIN_FILE=3rdParty/rbfx/CMake/Toolchains/Emscripten.cmake  \
-        -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON                                     \
-        -DEMSCRIPTEN_ROOT_PATH=$EMSDK/upstream/emscripten/                      \
-        -DCMAKE_BUILD_TYPE=Release                                              \
-        -DCMAKE_INSTALL_PREFIX=$ci_sdk_dir                                      \
-        -DCI_WEB_BUILD=ON                                                       \
-        -DBUILD_SHARED_LIBS=OFF                                                 \
-        -DURHO3D_PROFILING=OFF                                                  \
+        -G Ninja                                                                                    \
+        -DCMAKE_TOOLCHAIN_FILE=$EMSDK/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake   \
+        -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON                                                         \
+        -DEMSCRIPTEN_ROOT_PATH=$EMSDK/upstream/emscripten/                                          \
+        -DCMAKE_BUILD_TYPE=Release                                                                  \
+        -DCMAKE_INSTALL_PREFIX=$ci_sdk_dir                                                          \
+        -DCI_WEB_BUILD=ON                                                                           \
+        -DBUILD_SHARED_LIBS=OFF                                                                     \
+        -DURHO3D_PROFILING=OFF                                                                      \
         -B $ci_build_dir -S "$ci_source_dir"
 }
 
