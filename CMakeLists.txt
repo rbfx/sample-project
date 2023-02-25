@@ -48,8 +48,10 @@ add_subdirectory (${CMAKE_SOURCE_DIR}/Source)
 add_subdirectory (${CMAKE_SOURCE_DIR}/Launcher)
 
 # Add custom player and editor with injected plugins.
-add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Player)
-add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Editor)
+if (NOT ANDROID)
+    add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Player)
+    add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Editor)
+endif()
 
 # Package resources from Project directory.
 if (WEB OR MOBILE)

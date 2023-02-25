@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+
+// Relative path to engine source code directory. Modify as required.
+def projectSourceDir = '..'
+// Relative path to project source code directory. Modify as required.
+def rbfxSourceDir = '../3rdParty/rbfx'
+// Minimum required CMake version. This is same as in ../CMakeLists.txt.
+def cmakeVersion = '3.22.0.0+'
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:7.2.1'
+        // NOTE: Do not place your application dependencies here; they belong
+        // in the individual module build.gradle files
+    }
+}
+
+android {
+    compileSdkVersion 32
+    defaultConfig {
+        applicationId 'io.urho3d'
+        versionCode 1
+        versionName '1.0.0'
+        minSdkVersion 17
+        targetSdkVersion 32
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+        }
+        externalNativeBuild {
+            cmake {
+                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-21', '-DANDROID=1',
+                          '-DANDROID_ARM_MODE=arm', '-DBUILD_SHARED_LIBS=OFF'
+            }
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            version "${cmakeVersion}"
+            path "${projectSourceDir}/CMakeLists.txt"
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt')
+
+        }
+    }
+    sourceSets.main {
+        manifest.srcFile 'AndroidManifest.xml'
+        java.srcDirs = ['src', "${rbfxSourceDir}/Source/ThirdParty/SDL/android-project/app/src/main/java"]
+        res.srcDirs = ['res', "${projectSourceDir}/StoreArt/Android/Icons"]
+        assets.srcDirs = ['assets', "${projectSourceDir}/Project"]
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}

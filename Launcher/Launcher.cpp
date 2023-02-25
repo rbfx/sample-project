@@ -48,8 +48,11 @@ void Launcher::Setup()
 {
     FileSystem* fs = context_->GetSubsystem<FileSystem>();
 
+    engineParameters_[EP_RESOURCE_PATHS] = "CoreData;Data";
+
 #if MOBILE
-    engineParameters_[EP_RESOURCE_PATHS] = "";
+    engineParameters_[EP_ORIENTATIONS] = "Portrait";
+    engineParameters_[EP_RESOURCE_PREFIX_PATHS] = ";..;../..";
 #else
     engineParameters_[EP_RESOURCE_PREFIX_PATHS] = fs->GetProgramDir() + ";" + fs->GetCurrentDir() + "../";
 #endif
