@@ -1,5 +1,5 @@
-project (SampleProject)
 cmake_minimum_required(VERSION 3.14)
+project (SampleProject)
 
 set (PROJECT_UWP_GUID "D84454DA-854B-3661-9EDA-0B587569493A")
 
