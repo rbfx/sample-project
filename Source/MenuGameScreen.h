@@ -19,6 +19,10 @@ public:
     explicit MainMenuWindow(Context* context);
 
     void SetGame(SampleGameScreen* game);
+    bool HasGame() const { return isGamePlayed_; }
+
+	void OnContinue();
+    void OnExit();
 private:
     MenuGameScreen* GetApplicationState() const;
 
@@ -28,10 +32,8 @@ private:
     void OnDataModelInitialized(Rml::DataModelConstructor& constructor) override;
     /// @}
 
-    void OnContinue();
     void OnNewGame();
     void OnSettings();
-    void OnExit();
 
     /// Get current application instance.
     SampleProject* GetApp() const;

@@ -139,6 +139,9 @@ MenuGameScreen::MenuGameScreen(Context* context)
     // Set up a viewport so 3D scene can be visible.
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, camera));
     SetViewport(0, viewport);
+
+    // Disable updates until state is activated.
+    scene_->SetUpdateEnabled(false);
 }
 
 MenuGameScreen::~MenuGameScreen()
@@ -153,6 +156,9 @@ void MenuGameScreen::Activate(StringVariantMap& bundle)
     window_->SetEnabled(true);
     window_->SetGame(dynamic_cast<SampleGameScreen*>(bundle["Game"].GetPtr()));
     SubscribeToEvent(Urho3D::E_KEYDOWN, URHO3D_HANDLER(MenuGameScreen, HandleKeyDown));
+
+    // Enable scene updates.
+    scene_->SetUpdateEnabled(true);
 }
 
 void MenuGameScreen::Update(float timeStep)
@@ -163,6 +169,9 @@ void MenuGameScreen::Deactivate()
 {
     BaseClassName::Deactivate();
 
+    // Disable updates until state is activated.
+    scene_->SetUpdateEnabled(false);
+
     UnsubscribeFromEvent(Urho3D::E_KEYDOWN);
     window_->SetEnabled(false);
 }
@@ -172,6 +181,9 @@ void MenuGameScreen::HandleKeyDown(StringHash eventType, VariantMap& eventData)
     const auto key = static_cast<Key>(eventData[KeyDown::P_KEY].GetUInt());
     if (key == KEY_ESCAPE)
     {
-        context_->GetSubsystem<Engine>()->Exit();
+        if (window_->HasGame())
+            window_->OnContinue();
+        else
+            window_->OnExit();
     }
 }
