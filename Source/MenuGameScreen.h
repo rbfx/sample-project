@@ -29,7 +29,7 @@ private:
     /// Implement RmlUIComponent
     /// @{
     void Update(float timeStep) override;
-    void OnDataModelInitialized() override;
+    void OnDataModelInitialized() final;
     /// @}
 
     void OnNewGame();
