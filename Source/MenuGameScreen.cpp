@@ -51,7 +51,9 @@ void MainMenuWindow::SetGame(SampleGameScreen* game)
 
 void MainMenuWindow::OnDataModelInitialized()
 {
-    Rml::DataModelConstructor* constructor = GetDataModelConstructor();
+    Rml::DataModelConstructor* constructor = this->GetDataModelConstructor();
+    if (!constructor) return;
+
     constructor->RegisterArray<StringVector>();
 
     constructor->Bind("is_game_played", &isGamePlayed_);
