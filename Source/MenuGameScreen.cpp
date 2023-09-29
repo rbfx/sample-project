@@ -51,8 +51,8 @@ void MainMenuWindow::SetGame(SampleGameScreen* game)
 
 void MainMenuWindow::OnDataModelInitialized()
 {
-    Rml::DataModelConstructor* constructor = this->GetDataModelConstructor();
-    if (!constructor) return;
+    Rml::DataModelConstructor* constructor = GetDataModelConstructor();
+    URHO3D_ASSERT(constructor);
 
     constructor->RegisterArray<StringVector>();
 
