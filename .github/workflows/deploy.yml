@@ -10,6 +10,7 @@ env:
   # common settings
   CMAKE_VERSION: 3.21.x
   # paths
+  ci_native_sdk_name: rebelfork-sdk-Linux-clang-rel-dll-x64-latest.zip
   ci_source_dir: ${{ github.workspace }}/source-code
   ci_build_script: ./source-code/Script/ci_build.sh
   ci_build_dir: ${{ github.workspace }}/cmake-build
@@ -46,11 +47,32 @@ jobs:
         with:
           version: ${{ matrix.ci_emsdk_version }}
 
-      - uses: actions/checkout@v2
+      - name: Checkout Sample Project
+        uses: actions/checkout@v2
         with:
           path: ${{ env.ci_source_dir }}
           fetch-depth: 1
           submodules: true
+
+      - name: Checkout the Framework
+        uses: actions/checkout@v2
+        with:
+          repository: rbfx/rbfx
+          path: ${{ env.ci_source_dir }}/../rbfx
+          fetch-depth: 1
+          submodules: true
+
+      - name: Download native SDK
+        uses: robinraju/release-downloader@v1.8
+        with:
+          repository: rbfx/rbfx
+          tag: latest
+          fileName: ${{ env.ci_native_sdk_name }}
+      
+      - name: Unzip native SDK
+        run: |
+          cd ${{ github.workspace }}
+          unzip ${{ env.ci_native_sdk_name }}
 
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.8
@@ -77,7 +99,7 @@ jobs:
         if: ${{ github.ref == 'refs/heads/master' && github.repository == 'rbfx/sample-project' }}
         uses: KikimoraGames/itch-publish@v0.0.3
         with:
-          butlerAPIKey: ${{ secrets.BUTLER_API_KEY }}
+          butlerApiKey: ${{ secrets.BUTLER_API_KEY }}
           gameData: ${{ github.workspace }}/cmake-build/bin/project
           itchUsername: eugeneko
           itchGameId: sample-project

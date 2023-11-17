@@ -10,6 +10,8 @@ TODO: Expand this page and the sample.
 
 Checkout and build this project like any other CMake project.
 
+Make sure that checked out `rbfx` folder is next to the project folder.
+
 Check out `Scripts/` folder and `.github/workflows/deploy.yml` to see how this sample can be built.
 
 ## Running the Sample

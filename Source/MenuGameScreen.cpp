@@ -49,16 +49,19 @@ void MainMenuWindow::SetGame(SampleGameScreen* game)
     DirtyAllVariables();
 }
 
-void MainMenuWindow::OnDataModelInitialized(Rml::DataModelConstructor& constructor)
+void MainMenuWindow::OnDataModelInitialized()
 {
-    constructor.RegisterArray<StringVector>();
+    Rml::DataModelConstructor* constructor = GetDataModelConstructor();
+    URHO3D_ASSERT(constructor);
 
-    constructor.Bind("is_game_played", &isGamePlayed_);
+    constructor->RegisterArray<StringVector>();
 
-    constructor.BindEventCallback("on_continue", WrapCallback(&MainMenuWindow::OnContinue));
-    constructor.BindEventCallback("on_new_game", WrapCallback(&MainMenuWindow::OnNewGame));
-    constructor.BindEventCallback("on_settings", WrapCallback(&MainMenuWindow::OnSettings));
-    constructor.BindEventCallback("on_exit", WrapCallback(&MainMenuWindow::OnExit));
+    constructor->Bind("is_game_played", &isGamePlayed_);
+
+    constructor->BindEventCallback("on_continue", WrapCallback(&MainMenuWindow::OnContinue));
+    constructor->BindEventCallback("on_new_game", WrapCallback(&MainMenuWindow::OnNewGame));
+    constructor->BindEventCallback("on_settings", WrapCallback(&MainMenuWindow::OnSettings));
+    constructor->BindEventCallback("on_exit", WrapCallback(&MainMenuWindow::OnExit));
 }
 
 MenuGameScreen* MainMenuWindow::GetApplicationState() const

@@ -36,10 +36,10 @@ set (URHO3D_EDITOR OFF CACHE BOOL "")
 set (URHO3D_PLUGIN_LIST ${CMAKE_PROJECT_NAME} CACHE BOOL "")
 
 # Include common build scripts.
-include (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/CMake/Modules/UrhoCommon.cmake)
+include (${CMAKE_SOURCE_DIR}/../rbfx/CMake/Modules/UrhoCommon.cmake)
 
-# Include the Framework.
-add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx)
+# Include the Framework to build.
+add_subdirectory (../rbfx ${CMAKE_BINARY_DIR}/3rdParty/rbfx)
 
 # Add project source files.
 add_subdirectory (${CMAKE_SOURCE_DIR}/Source)
@@ -49,8 +49,8 @@ add_subdirectory (${CMAKE_SOURCE_DIR}/Launcher)
 
 # Add custom player and editor with injected plugins.
 if (NOT ANDROID)
-    add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Player)
-    add_subdirectory (${CMAKE_SOURCE_DIR}/3rdParty/rbfx/Source/Editor)
+    add_subdirectory (${rbfx_SOURCE_DIR}/Source/Player ${CMAKE_BINARY_DIR}/3rdParty/rbfx/Source/Player)
+    add_subdirectory (${rbfx_SOURCE_DIR}/Source/Editor ${CMAKE_BINARY_DIR}/3rdParty/rbfx/Source/Editor)
 endif()
 
 # Package resources from Project directory.
@@ -70,5 +70,5 @@ if (WEB)
         INSTALL_TO   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     )
     web_link_resources(Player Resources.js)
-    target_link_libraries(Player PRIVATE "--shell-file ${CMAKE_SOURCE_DIR}/3rdParty/rbfx/bin/shell.html")
+    target_link_libraries(Player PRIVATE "--shell-file ${rbfx_SOURCE_DIR}/bin/shell.html")
 endif ()

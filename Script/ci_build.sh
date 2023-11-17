@@ -25,7 +25,7 @@ function action-generate() {
         -DCMAKE_BUILD_WITH_INSTALL_RPATH=ON                                                         \
         -DEMSCRIPTEN_ROOT_PATH=$EMSDK/upstream/emscripten/                                          \
         -DCMAKE_BUILD_TYPE=Release                                                                  \
-        -DCMAKE_INSTALL_PREFIX=$ci_sdk_dir                                                          \
+        -DURHO3D_SDK=$ci_sdk_dir                                                                    \
         -DCI_WEB_BUILD=ON                                                                           \
         -DBUILD_SHARED_LIBS=OFF                                                                     \
         -DURHO3D_PROFILING=OFF                                                                      \
