@@ -22,6 +22,7 @@
 
 #include "SampleProject.h"
 
+#include <Urho3D/Core/ProcessUtils.h>
 #include <Urho3D/Engine/Engine.h>
 #include <Urho3D/Engine/EngineDefs.h>
 #include <Urho3D/Graphics/Renderer.h>
@@ -84,7 +85,8 @@ void SampleProject::Start(bool isMain)
     // Allocate main menu screen.
     menuScreen_ = MakeShared<MenuGameScreen>(context_);
 
-    if (fromEditor)
+    // TODO: Web cursor is broken, disable menu on Web for now.
+    if (fromEditor || GetPlatform() == PlatformId::Web)
     {
         // Activate game screen.
         StringVariantMap bundle;
