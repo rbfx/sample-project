@@ -5,6 +5,8 @@ on:
       - 'no-ci-**'
       - 'skip-ci-**'
   pull_request:
+  schedule:
+    - cron: '0 0 * * 0'
 
 env:
   # common settings
