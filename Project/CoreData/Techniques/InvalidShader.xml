@@ -1,4 +1,0 @@
-<technique vs="M_InvalidShader" ps="M_InvalidShader">
-    <pass name="base" />
-    <pass name="deferred" />
-</technique>

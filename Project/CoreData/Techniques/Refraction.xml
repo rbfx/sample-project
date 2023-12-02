@@ -1,3 +1,0 @@
-<technique vs="M_Refraction" ps="M_Refraction">
-    <pass name="alpha" depthwrite="false" />
-</technique>

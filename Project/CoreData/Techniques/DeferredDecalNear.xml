@@ -1,3 +1,0 @@
-<technique vs="M_DeferredDecal" ps="M_DeferredDecal">
-    <pass name="deferred_decal" cull="cw" depthtest="greater" depthwrite="false" blend="decal" />
-</technique>

@@ -1,4 +1,0 @@
-<technique vs="M_Water" ps="M_Water">
-    <pass name="alpha" depthwrite="false" />
-    <pass name="litalpha" depthwrite="false" blend="add" />
-</technique>
