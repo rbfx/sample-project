@@ -55,8 +55,8 @@ endif()
 
 # Package resources from Project directory.
 if (WEB OR MOBILE)
-    create_pak("${CMAKE_SOURCE_DIR}/Project/Data"     "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak")
-    create_pak("${CMAKE_SOURCE_DIR}/Project/CoreData" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak")
+    create_pak("${CMAKE_SOURCE_DIR}/Project/Data"         "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak")
+    create_pak("${CMAKE_SOURCE_DIR}/../rbfx/bin/CoreData" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak")
 endif ()
 
 # Link resources to Player for Web.

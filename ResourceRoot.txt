@@ -1,0 +1,3 @@
+Data = Project/Data
+Cache = Project/Cache
+CoreData = ../rbfx/bin/CoreData

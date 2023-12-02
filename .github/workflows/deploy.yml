@@ -70,7 +70,7 @@ jobs:
           repository: rbfx/rbfx
           tag: latest
           fileName: ${{ env.ci_native_sdk_name }}
-      
+
       - name: Unzip native SDK
         run: |
           cd ${{ github.workspace }}
