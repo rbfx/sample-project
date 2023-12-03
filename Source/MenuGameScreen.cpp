@@ -138,6 +138,7 @@ MenuGameScreen::MenuGameScreen(Context* context)
 
     // Create a window rendered into backbuffer.
     window_ = scene_->CreateComponent<MainMenuWindow>();
+    window_->SetEnabled(false);
 
     // Set up a viewport so 3D scene can be visible.
     SharedPtr<Viewport> viewport(new Viewport(context_, scene_, camera));

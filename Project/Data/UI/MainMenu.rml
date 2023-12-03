@@ -389,35 +389,6 @@
     </div>
     </div>
     </div>
-
-    <div id="right-panel">
-    <div class="panel-overlap-container">
-    <!-- "Load Game" window -->
-    <div id="load-game-panel">
-    <div class="window" id="load-game-window" data-class-hidden="navigable_group!='game_to_load_group'">
-        <div class="window" id="games-to-load-list">
-            <navigable group="game_to_load_group" data-for="saved_game_text : saved_games" class="game-to-load-button-controller"
-                onnavigated="sound:20% Sounds/UINavigated.wav" onpressed="sound:Sounds/UIClicked.wav"
-                data-event-pressed="game_to_load=saved_game_text; on_load_game(!ev.is_mouse); navigable_pop(!ev.is_mouse)"
-                data-event-dblclick="game_to_load=saved_game_text; on_load_game(); navigable_pop()">
-                <input type="button" class="navigable-button list-button" data-rml="saved_game_text"></input>
-            </navigable>
-        </div>
-        <div id="load-game-buttons-panel">
-            <input type="button" class="native-button utility-button"
-                onmouseover="sound:20% Sounds/UINavigated.wav" onclick="sound:Sounds/UIClicked.wav"
-                data-event-click="navigable_pop()">Back</input>
-            <input type="button" class="native-button utility-button"
-                onmouseover="sound:20% Sounds/UINavigated.wav" onclick="sound:Sounds/UIClicked.wav"
-                data-event-click="on_load_game(); navigable_pop()"
-                data-attrif-disabled="game_to_load==''">Load</input>
-            <input type="button" class="native-button utility-button" disabled
-                onmouseover="sound:20% Sounds/UINavigated.wav" onclick="sound:Sounds/UIClicked.wav">Delete</input>
-        </div>
-    </div>
-    </div>
-    </div>
-    </div>
 </div>
 </body>
 
