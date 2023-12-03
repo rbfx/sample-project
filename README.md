@@ -30,6 +30,19 @@ Run Editor:
 
 Run Player:
 
-Launch `Player.exe --pp path/to/sample-project/Project`
+Launch `Player.exe`
+
+## Portability of Resource Access
+
+The engine needs to somehow locate project resources on launch.
+
+By default, the engine attempts to find `Data`, `Cache` and `CoreData` folders next to the executable.
+However, this behavior may be inconvenient during development:
+* `Data` and `Cache` folders are located in `Project` folder,
+* `CoreData` is located in `bin` folder of `rbfx` repository,
+* The executable is located somewhere in CMake build folder.
+
+This issue can be mitigated by having `ResourceRoot.ini` file.
+See the comments in `ResourceRoot.ini` file in this repository for details.
 
 ![](/screenshot.png)
