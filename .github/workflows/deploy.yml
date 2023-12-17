@@ -38,8 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         ci_emsdk_version:
-          #- latest
-          - 3.1.24  # Minimal supported
+          - latest
 
     env:
       BINARYEN_CORES: 1
