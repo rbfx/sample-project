@@ -43,6 +43,12 @@ MainMenuWindow::MainMenuWindow(Context* context)
 {
     SetResource("UI/MainMenu.rml");
 }
+
+void MainMenuWindow::RegisterObject(Context* context)
+{
+    context->RegisterFactory<MainMenuWindow>();
+}
+
 void MainMenuWindow::SetGame(SampleGameScreen* game)
 {
     isGamePlayed_ = GetApp()->IsGamePlayed();

@@ -38,15 +38,13 @@ URHO3D_DEFINE_PLUGIN_MAIN(SampleProject);
 SampleProject::SampleProject(Context* context)
     : MainPluginApplication(context)
 {
-    RegisterObject<PlayerController>();
-    if (!context_->IsReflected<MainMenuWindow>())
-        context_->AddFactoryReflection<MainMenuWindow>();
-    if (!context_->IsReflected<SampleGameScreen>())
-        context_->AddFactoryReflection<SampleGameScreen>();
 }
 
 void SampleProject::Load()
 {
+    RegisterObject<PlayerController>();
+    RegisterObject<MainMenuWindow>();
+    RegisterObject<SampleGameScreen>();
 }
 
 void SampleProject::Unload()

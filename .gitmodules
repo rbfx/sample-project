@@ -1,0 +1,3 @@
+[submodule "Plugins/Core.SamplePlugin"]
+	path = Plugins/Core.SamplePlugin
+	url = https://github.com/rbfx/Core.SamplePlugin.git

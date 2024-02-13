@@ -32,14 +32,18 @@ set (URHO3D_TESTING OFF CACHE BOOL "")
 set (URHO3D_PLAYER OFF CACHE BOOL "")
 set (URHO3D_EDITOR OFF CACHE BOOL "")
 
-# Link project plugin to Player and Editor.
-set (URHO3D_PLUGIN_LIST ${CMAKE_PROJECT_NAME} CACHE BOOL "")
-
 # Include common build scripts.
 include (${CMAKE_SOURCE_DIR}/../rbfx/CMake/Modules/UrhoCommon.cmake)
 
 # Include the Framework to build.
 add_subdirectory (../rbfx ${CMAKE_BINARY_DIR}/3rdParty/rbfx)
+
+# Add plugins (optional).
+include_directories (${CMAKE_SOURCE_DIR}/Plugins)
+add_subdirectory (${CMAKE_SOURCE_DIR}/Plugins/Core.SamplePlugin)
+
+# Link external plugins and project plugin to Player and Editor.
+set (URHO3D_PLUGIN_LIST "Plugin.Core.SamplePlugin;${CMAKE_PROJECT_NAME}" CACHE STRING "" FORCE)
 
 # Add project source files.
 add_subdirectory (${CMAKE_SOURCE_DIR}/Source)

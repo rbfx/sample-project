@@ -11,7 +11,7 @@
                 {
                     "key": "Plugins",
                     "type": "String",
-                    "value": "SampleProject"
+                    "value": "Plugin.Core.SamplePlugin;SampleProject"
                 },
                 {
                     "key": "MainPlugin",

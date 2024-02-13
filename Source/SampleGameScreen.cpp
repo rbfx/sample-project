@@ -112,6 +112,11 @@ SampleGameScreen::~SampleGameScreen()
     cameraNode_ = nullptr;
 }
 
+void SampleGameScreen::RegisterObject(Context* context)
+{
+    context->RegisterFactory<SampleGameScreen>();
+}
+
 void SampleGameScreen::InitScene()
 {
     if (scene_)

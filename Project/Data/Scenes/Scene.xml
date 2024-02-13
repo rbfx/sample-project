@@ -3,7 +3,7 @@
 	<attribute name="Name" value="" />
 	<attribute name="Time Scale" value="1.000000" />
 	<attribute name="Elapsed Time" value="0.000000" />
-	<attribute name="Next Node ID" value="20" />
+	<attribute name="Next Node ID" value="21" />
 	<attribute name="Next Component ID" value="16777217" />
 	<attribute name="Variables" />
 	<attribute name="Variable Names" value="" />
@@ -95,6 +95,36 @@
 			<component type="CollisionShape" id="13">
 				<attribute name="Size" value="10 1 10" />
 				<attribute name="Offset Position" value="0 -0.5 0" />
+			</component>
+		</node>
+		<node id="20">
+			<attribute name="Is Enabled" value="true" />
+			<attribute name="Name" value="Rotating Teapot" />
+			<attribute name="Tags" />
+			<attribute name="Position" value="0 0 0" />
+			<attribute name="Rotation" value="1 0 0 0" />
+			<attribute name="Scale" value="3 3 3" />
+			<attribute name="Variables" />
+			<component type="StaticModel" id="18">
+				<attribute name="Model" value="Model;Models/TeaPot.mdl" />
+				<attribute name="Material" value="Material;Materials/CubeMetallic.xml;Materials/CubeMetallic.xml" />
+				<attribute name="Cast Shadows" value="true" />
+			</component>
+			<component type="CollisionShape" id="14">
+				<attribute name="Size" value="1.05 0.34 0.15" />
+				<attribute name="Offset Position" value="0.04 0.27 0" />
+			</component>
+			<component type="RigidBody" id="19">
+				<attribute name="Is Kinematic" value="true" />
+			</component>
+			<component type="CollisionShape" id="20">
+				<attribute name="Shape Type" value="Sphere" />
+				<attribute name="Size" value="0.68 0.68 0.68" />
+				<attribute name="Offset Position" value="0 0.2 0" />
+			</component>
+			<component type="SampleComponent" id="6">
+				<attribute name="Axis" value="0 1 0" />
+				<attribute name="Rotation Speed" value="30.000000" />
 			</component>
 		</node>
 	</node>

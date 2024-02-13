@@ -18,6 +18,8 @@ class MainMenuWindow : public RmlUIComponent
 public:
     explicit MainMenuWindow(Context* context);
 
+    static void RegisterObject(Context* context);
+
     void SetGame(SampleGameScreen* game);
     bool HasGame() const { return isGamePlayed_; }
 

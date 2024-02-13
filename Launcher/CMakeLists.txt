@@ -4,7 +4,6 @@ set (TARGET_NAME "${CMAKE_PROJECT_NAME}Launcher")
 file (GLOB_RECURSE SOURCE_FILES *.h *.cpp)
 
 if (WIN32)
-# Pass UWP define to project if 
     if (UWP)
         add_definitions (-DUWP=1)
 

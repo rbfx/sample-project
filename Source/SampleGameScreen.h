@@ -48,12 +48,15 @@ public:
     explicit SampleGameScreen(Context* context);
     ~SampleGameScreen() override;
 
+    static void RegisterObject(Context* context);
+
     /// Implement ApplicationState.
     /// @{
     void Activate(StringVariantMap& bundle) override;
     void Update(float timeStep) override;
     void Deactivate() override;
     /// @}
+
 private:
     /// Save game.
     void SaveGame();
