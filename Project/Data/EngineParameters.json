@@ -11,12 +11,12 @@
                 {
                     "key": "Plugins",
                     "type": "String",
-                    "value": "Plugin.Core.SamplePlugin;SampleProject"
+                    "value": "Plugin.Core.SamplePlugin;App.Main"
                 },
                 {
                     "key": "MainPlugin",
                     "type": "String",
-                    "value": "SampleProject"
+                    "value": "App.Main"
                 }
             ]
         }

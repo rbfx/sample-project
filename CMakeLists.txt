@@ -6,66 +6,61 @@ set (PROJECT_UWP_GUID "D84454DA-854B-3661-9EDA-0B587569493A")
 # C++17 is required for this project.
 set (CMAKE_CXX_STANDARD 17)
 
-# Setup output direcotries.
+# Setup output directories.
 set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Generate Urho3DAll.h with all engine includes.
-# It is not required, but it may be useful.
-set (URHO3D_MONOLITHIC_HEADER ON CACHE BOOL "")
+# It is possible to use pre-built SDK or build the Framework from source.
+# In your project, you can choose either option or keep both.
+set (REBELFORK_SDK "" CACHE STRING "Path to pre-built SDK")
+if ("${REBELFORK_SDK}" STREQUAL "")
+    # Include the Framework to build.
+    add_subdirectory (../rbfx ${CMAKE_BINARY_DIR}/3rdParty/rbfx)
 
-# Disable unused features to speed up build
-set (URHO3D_CSHARP OFF CACHE BOOL "")
-set (URHO3D_GLOW OFF CACHE BOOL "")
-set (URHO3D_IK OFF CACHE BOOL "")
-set (URHO3D_NETWORK OFF CACHE BOOL "")
-set (URHO3D_URHO2D OFF CACHE BOOL "")
-set (URHO3D_PHYSICS2D OFF CACHE BOOL "")
-set (URHO3D_SAMPLES OFF CACHE BOOL "")
-set (URHO3D_PROFILING OFF CACHE BOOL "")
-set (URHO3D_TESTING OFF CACHE BOOL "")
+    # Set path to engine resources.
+    set (REBELFORK_BIN_DIR "${CMAKE_SOURCE_DIR}/../rbfx/bin")
+else ()
+    # Include pre-built SDK.
+    # CMAKE_FIND_ROOT_PATH is required for Web builds because EMSDK ignores CMAKE_PREFIX_PATH by default.
+    set (CMAKE_PREFIX_PATH ${REBELFORK_SDK}/share)
+    list (APPEND CMAKE_FIND_ROOT_PATH ${REBELFORK_SDK}/share)
+    find_package (Urho3D REQUIRED)
 
-# Disable default Player and Editor to inject static plugins later.
-# Dynamically linked builds don't need it since default Player and Editor can load *.dll/*.so just fine.
-# But static builds require this to statically inject user code into Player and Editor.
-set (URHO3D_PLAYER OFF CACHE BOOL "")
-set (URHO3D_EDITOR OFF CACHE BOOL "")
+    # Include common build scripts.
+    include (${REBELFORK_SDK}/share/CMake/Modules/UrhoCommon.cmake)
 
-# Include common build scripts.
-include (${CMAKE_SOURCE_DIR}/../rbfx/CMake/Modules/UrhoCommon.cmake)
-
-# Include the Framework to build.
-add_subdirectory (../rbfx ${CMAKE_BINARY_DIR}/3rdParty/rbfx)
+    # Set path to engine resources.
+    set (REBELFORK_BIN_DIR "${REBELFORK_SDK}/bin")
+endif ()
 
 # Add plugins (optional).
 include_directories (${CMAKE_SOURCE_DIR}/Plugins)
 add_subdirectory (${CMAKE_SOURCE_DIR}/Plugins/Core.SamplePlugin)
 
-# Link external plugins and project plugin to Player and Editor.
-set (URHO3D_PLUGIN_LIST "Plugin.Core.SamplePlugin;${CMAKE_PROJECT_NAME}" CACHE STRING "" FORCE)
+# List all plugins used by the application.
+set (APP_PLUGIN_NAME "App.Main")
+set (APP_PLUGIN_LIST "Plugin.Core.SamplePlugin;${APP_PLUGIN_NAME}")
 
-# Add project source files.
-add_subdirectory (${CMAKE_SOURCE_DIR}/Source)
+# Add main application library with all user code.
+add_subdirectory (${CMAKE_SOURCE_DIR}/Source/Application)
 
-# Add launcher source files.
-add_subdirectory (${CMAKE_SOURCE_DIR}/Launcher)
+# Add custom editor linked with user code.
+# With dynamic linking, pre-built editor can be used.
+add_subdirectory (${CMAKE_SOURCE_DIR}/Source/Editor)
 
-# Add custom player and editor with injected plugins.
-if (NOT ANDROID)
-    add_subdirectory (${rbfx_SOURCE_DIR}/Source/Player ${CMAKE_BINARY_DIR}/3rdParty/rbfx/Source/Player)
-    add_subdirectory (${rbfx_SOURCE_DIR}/Source/Editor ${CMAKE_BINARY_DIR}/3rdParty/rbfx/Source/Editor)
-endif()
+# Add custom player.
+add_subdirectory (${CMAKE_SOURCE_DIR}/Source/Launcher)
 
 # Package resources from Project directory.
 if (WEB OR MOBILE)
-    create_pak("${CMAKE_SOURCE_DIR}/Project/Data"         "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak")
-    create_pak("${CMAKE_SOURCE_DIR}/../rbfx/bin/CoreData" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak")
+    create_pak("${CMAKE_SOURCE_DIR}/Project/Data"   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak")
+    create_pak("${REBELFORK_BIN_DIR}/CoreData"      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak")
 endif ()
 
 # Link resources to Player for Web.
 if (WEB)
-    web_executable (Player)
+    web_executable (${CMAKE_PROJECT_NAME})
     package_resources_web(
         FILES        "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak"
                      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak"
@@ -73,6 +68,6 @@ if (WEB)
         OUTPUT       "Resources.js"
         INSTALL_TO   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     )
-    web_link_resources(Player Resources.js)
-    target_link_libraries(Player PRIVATE "--shell-file ${rbfx_SOURCE_DIR}/bin/shell.html")
+    web_link_resources(${CMAKE_PROJECT_NAME} Resources.js)
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE "--shell-file ${REBELFORK_BIN_DIR}/shell.html")
 endif ()

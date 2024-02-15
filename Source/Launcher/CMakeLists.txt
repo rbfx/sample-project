@@ -1,7 +1,7 @@
-set (TARGET_NAME "${CMAKE_PROJECT_NAME}Launcher")
+set (TARGET_NAME "${CMAKE_PROJECT_NAME}")
 
 # Include source files.
-file (GLOB_RECURSE SOURCE_FILES *.h *.cpp)
+set (SOURCE_FILES Launcher.cpp)
 
 if (WIN32)
     if (UWP)
@@ -40,10 +40,10 @@ if (ANDROID)
 else ()
     add_executable(${TARGET_NAME} WIN32 MACOSX_BUNDLE ${SOURCE_FILES} ${RESOURCE_FILES})
 endif ()
-# Link launcher with game and engine code
-target_link_libraries (${TARGET_NAME} PRIVATE Urho3D "${CMAKE_PROJECT_NAME}")
-# Add static plugin with the game code
-link_static_plugins (${TARGET_NAME} "${URHO3D_PLUGIN_LIST}")
+
+# Link launcher with the engine and plugins.
+target_link_libraries (${TARGET_NAME} PRIVATE Urho3D PlayerLibrary)
+link_static_plugins (${TARGET_NAME} "${APP_PLUGIN_LIST}")
 
 if (UWP)
     set_property(TARGET ${TARGET_NAME} PROPERTY VS_DESKTOP_EXTENSIONS_VERSION "${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")

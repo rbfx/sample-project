@@ -2,14 +2,13 @@
 file (GLOB_RECURSE SOURCE_FILES *.h *.cpp)
 
 # Add dynamic or static library.
-set (TARGET_NAME ${CMAKE_PROJECT_NAME})
-add_library(${TARGET_NAME} ${SOURCE_FILES})
+add_library(${APP_PLUGIN_NAME} ${SOURCE_FILES})
 
 # Link the engine and dependencies.
-target_link_libraries (${TARGET_NAME} PRIVATE
+target_link_libraries (${APP_PLUGIN_NAME} PRIVATE
     Urho3D
     Plugin.Core.SamplePlugin
 )
 
 # Declare that this library could be a static plugin.
-define_static_plugin (${TARGET_NAME} ${CMAKE_PROJECT_NAME})
+define_static_plugin (${APP_PLUGIN_NAME} ${APP_PLUGIN_NAME})

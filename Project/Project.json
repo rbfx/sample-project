@@ -10,7 +10,7 @@
 	"PluginManager": {
 		"LoadedPlugins": [
 			"Plugin.Core.SamplePlugin",
-			"SampleProject"
+			"App.Main"
 		]
 	}
 }

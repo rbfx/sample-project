@@ -13,10 +13,12 @@ env:
   CMAKE_VERSION: 3.21.x
   # paths
   ci_native_sdk_name: rebelfork-sdk-Linux-clang-rel-dll-x64-latest.zip
+  ci_target_sdk_name: rebelfork-sdk-Web-rel-lib-latest.zip
   ci_source_dir: ${{ github.workspace }}/source-code
   ci_build_script: ./source-code/Script/ci_build.sh
   ci_build_dir: ${{ github.workspace }}/cmake-build
-  ci_sdk_dir: ${{ github.workspace }}/SDK
+  ci_native_sdk_dir: ${{ github.workspace }}/SDK-native
+  ci_target_sdk_dir: ${{ github.workspace }}/SDK-target
 
 jobs:
   CheckSkipCI:
@@ -55,14 +57,6 @@ jobs:
           fetch-depth: 1
           submodules: true
 
-      - name: Checkout the Framework
-        uses: actions/checkout@v2
-        with:
-          repository: rbfx/rbfx
-          path: ${{ env.ci_source_dir }}/../rbfx
-          fetch-depth: 1
-          submodules: true
-
       - name: Download native SDK
         uses: robinraju/release-downloader@v1.8
         with:
@@ -74,6 +68,20 @@ jobs:
         run: |
           cd ${{ github.workspace }}
           unzip ${{ env.ci_native_sdk_name }}
+          mv ./SDK ./SDK-native
+
+      - name: Download target SDK
+        uses: robinraju/release-downloader@v1.8
+        with:
+          repository: rbfx/rbfx
+          tag: latest
+          fileName: ${{ env.ci_target_sdk_name }}
+
+      - name: Unzip target SDK
+        run: |
+          cd ${{ github.workspace }}
+          unzip ${{ env.ci_target_sdk_name }}
+          mv ./SDK ./SDK-target
 
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.8

@@ -49,6 +49,9 @@ void SampleProject::Load()
 
 void SampleProject::Unload()
 {
+    loadingScreen_ = nullptr;
+    gameScreen_ = nullptr;
+    menuScreen_ = nullptr;
 }
 
 void SampleProject::OpenMenu()
