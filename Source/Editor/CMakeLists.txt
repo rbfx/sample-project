@@ -1,4 +1,4 @@
-if (NOT DESKTOP)
+if (NOT TARGET EditorLibrary)
     return ()
 endif ()
 
@@ -8,4 +8,4 @@ endif ()
 set (TARGET_NAME "${CMAKE_PROJECT_NAME}Editor")
 add_executable (${TARGET_NAME} ${TARGET_TYPE} Editor.cpp)
 target_link_libraries (${TARGET_NAME} PUBLIC EditorLibrary)
-link_static_plugins (${TARGET_NAME} "${APP_PLUGIN_LIST}")
+target_link_plugins (${TARGET_NAME} "${APP_PLUGIN_LIST}")

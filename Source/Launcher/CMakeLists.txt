@@ -43,7 +43,7 @@ endif ()
 
 # Link launcher with the engine and plugins.
 target_link_libraries (${TARGET_NAME} PRIVATE Urho3D PlayerLibrary)
-link_static_plugins (${TARGET_NAME} "${APP_PLUGIN_LIST}")
+target_link_plugins (${TARGET_NAME} "${APP_PLUGIN_LIST}")
 
 if (UWP)
     set_property(TARGET ${TARGET_NAME} PROPERTY VS_DESKTOP_EXTENSIONS_VERSION "${CMAKE_VS_WINDOWS_TARGET_PLATFORM_VERSION}")

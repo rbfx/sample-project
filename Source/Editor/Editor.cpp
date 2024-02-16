@@ -1,3 +1,20 @@
 #include <Editor/EditorApplication.h>
 
-URHO3D_DEFINE_APPLICATION_MAIN(Urho3D::EditorApplication);
+using namespace Urho3D;
+
+class CustomEditorApplication : public EditorApplication
+{
+public:
+    using EditorApplication::EditorApplication;
+
+    /// Implement EditorApplication.
+    /// @{
+    void Setup() override
+    {
+        EditorApplication::Setup();
+        LinkedPlugins::RegisterStaticPlugins();
+    }
+    /// @}
+};
+
+URHO3D_DEFINE_APPLICATION_MAIN(CustomEditorApplication);

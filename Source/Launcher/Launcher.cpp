@@ -3,8 +3,7 @@
 
 #include <Player/PlayerApplication.h>
 
-namespace Urho3D
-{
+using namespace Urho3D;
 
 class LauncherApplication : public PlayerApplication
 {
@@ -24,9 +23,10 @@ public:
 #else
         engineParameters_[EP_RESOURCE_PREFIX_PATHS] = fs->GetProgramDir() + ";" + fs->GetCurrentDir() + "../";
 #endif
+
+        engineParameters_[EP_PLUGINS] = ea::string::joined(LinkedPlugins::GetLinkedPlugins(), ";");
+        LinkedPlugins::RegisterStaticPlugins();
     }
 };
 
-} // namespace Urho3D
-
-URHO3D_DEFINE_APPLICATION_MAIN(Urho3D::LauncherApplication);
+URHO3D_DEFINE_APPLICATION_MAIN(LauncherApplication);
