@@ -1,3 +1,5 @@
+#include "CreateRandomBox.h"
+
 #include <Editor/EditorApplication.h>
 
 using namespace Urho3D;
@@ -11,6 +13,8 @@ public:
     /// @{
     void Setup() override
     {
+        editorPluginManager_->AddPlugin("SampleProject.CreateRandomBox", &Plugin_CreateRandomBox);
+
         EditorApplication::Setup();
         LinkedPlugins::RegisterStaticPlugins();
     }
