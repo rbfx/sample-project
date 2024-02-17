@@ -15,6 +15,9 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # In your project, you can choose either option or keep both.
 set (REBELFORK_SDK "" CACHE STRING "Path to pre-built SDK")
 if ("${REBELFORK_SDK}" STREQUAL "")
+    # Include common build scripts.
+    include (${CMAKE_SOURCE_DIR}/../rbfx/CMake/Modules/UrhoCommon.cmake)
+
     # Include the Framework to build.
     add_subdirectory (../rbfx ${CMAKE_BINARY_DIR}/3rdParty/rbfx)
 
