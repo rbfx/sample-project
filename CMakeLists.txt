@@ -15,14 +15,12 @@ set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 # In your project, you can choose either option or keep both.
 set (REBELFORK_SDK "" CACHE STRING "Path to pre-built SDK")
 if ("${REBELFORK_SDK}" STREQUAL "")
-    # Include common build scripts.
-    include (${CMAKE_SOURCE_DIR}/../rbfx/CMake/Modules/UrhoCommon.cmake)
-
     # Include the Framework to build.
     add_subdirectory (../rbfx ${CMAKE_BINARY_DIR}/3rdParty/rbfx)
 
     # Set path to engine resources.
     set (REBELFORK_BIN_DIR "${CMAKE_SOURCE_DIR}/../rbfx/bin")
+    set (REBELFORK_CMAKE_DIR "${CMAKE_SOURCE_DIR}/../rbfx/CMake")
 else ()
     # Include pre-built SDK.
     # CMAKE_FIND_ROOT_PATH is required for Web builds because EMSDK ignores CMAKE_PREFIX_PATH by default.
@@ -30,12 +28,13 @@ else ()
     list (APPEND CMAKE_FIND_ROOT_PATH ${REBELFORK_SDK}/share)
     find_package (Urho3D REQUIRED)
 
-    # Include common build scripts.
-    include (${REBELFORK_SDK}/share/CMake/Modules/UrhoCommon.cmake)
-
     # Set path to engine resources.
     set (REBELFORK_BIN_DIR "${REBELFORK_SDK}/bin")
+    set (REBELFORK_CMAKE_DIR "${REBELFORK_SDK}/share/CMake")
 endif ()
+
+# Include common build scripts.
+include (${REBELFORK_CMAKE_DIR}/Modules/UrhoCommon.cmake)
 
 # Add plugins (optional).
 include_directories (${CMAKE_SOURCE_DIR}/Plugins)

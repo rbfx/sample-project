@@ -1,19 +1,20 @@
 name: Deploy
 on:
+  # Build on commits pushed, except when explicitly skipped.
   push:
     branches-ignore:
       - 'no-ci-**'
       - 'skip-ci-**'
+  # Build on pull requests, except drafts.
   pull_request:
+  # Build on a schedule to keep up with the engine changes.
   schedule:
     - cron: '0 0 * * 0'
 
 env:
-  # common settings
+  # Common settings.
   CMAKE_VERSION: 3.21.x
-  # paths
-  ci_native_sdk_name: rebelfork-sdk-Linux-clang-rel-dll-x64-latest.zip
-  ci_target_sdk_name: rebelfork-sdk-Web-rel-lib-latest.zip
+  # Common paths.
   ci_source_dir: ${{ github.workspace }}/source-code
   ci_build_script: ./source-code/Script/ci_build.sh
   ci_build_dir: ${{ github.workspace }}/cmake-build
@@ -31,6 +32,8 @@ jobs:
     steps:
       - run: exit 0
 
+  # Build the project for Web using both engine SDK and engine in subdirectory.
+  # SDK build is published to itch.io.
   Web:
     if: github.event.pull_request.draft == false
     runs-on: ubuntu-20.04
@@ -39,13 +42,15 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ci_emsdk_version:
-          - latest
         ci_build_mode:
           - sdk
           - subdirectory
 
     env:
+      ci_platform: web
+      ci_native_sdk_name: rebelfork-sdk-Linux-clang-rel-dll-x64-latest.zip
+      ci_target_sdk_name: rebelfork-sdk-Web-rel-lib-latest.zip
+      ci_emsdk_version: latest
       ci_build_mode: ${{ matrix.ci_build_mode }}
       ci_publish: ${{ github.ref == 'refs/heads/master' && github.repository == 'rbfx/sample-project' && matrix.ci_build_mode == 'sdk'}}
       BINARYEN_CORES: 1
@@ -53,7 +58,7 @@ jobs:
     steps:
       - uses: mymindstorm/setup-emsdk@v11
         with:
-          version: ${{ matrix.ci_emsdk_version }}
+          version: ${{ env.ci_emsdk_version }}
 
       - name: Checkout Sample Project
         uses: actions/checkout@v2
@@ -117,6 +122,7 @@ jobs:
         run: ${{ env.ci_build_script }} build
 
       - name: Prepare
+        if: ${{ env.ci_publish }}
         shell: bash
         run: ${{ env.ci_build_script }} prepare
 
@@ -129,3 +135,86 @@ jobs:
           itchUsername: eugeneko
           itchGameId: sample-project
           buildChannel: web
+
+  # Build the project for Windows using both engine SDK and engine in subdirectory.
+  Windows:
+    if: github.event.pull_request.draft == false
+    runs-on: windows-2022
+    needs: [CheckSkipCI]
+
+    strategy:
+      fail-fast: false
+      matrix:
+        ci_build_mode:
+          - sdk
+          - subdirectory
+
+    env:
+      ci_platform: windows
+      ci_target_sdk_name: rebelfork-sdk-Windows-msvc-rel-dll-x64-latest.zip
+      ci_build_mode: ${{ matrix.ci_build_mode }}
+      ci_publish: ${{ github.ref == 'refs/heads/master' && github.repository == 'rbfx/sample-project' && matrix.ci_build_mode == 'sdk'}}
+      BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+
+    steps:
+      - name: Checkout Sample Project
+        uses: actions/checkout@v3
+        with:
+          path: ${{ env.ci_source_dir }}
+          fetch-depth: 1
+          submodules: true
+
+      - name: Checkout the Framework
+        if: ${{ matrix.ci_build_mode == 'subdirectory' }}
+        uses: actions/checkout@v2
+        with:
+          repository: rbfx/rbfx
+          path: ${{ env.ci_source_dir }}/../rbfx
+          fetch-depth: 1
+          submodules: true
+
+      - name: Download target SDK
+        if: ${{ matrix.ci_build_mode == 'sdk' }}
+        uses: robinraju/release-downloader@v1.8
+        with:
+          repository: rbfx/rbfx
+          tag: latest
+          fileName: ${{ env.ci_target_sdk_name }}
+
+      - name: Unzip target SDK
+        if: ${{ matrix.ci_build_mode == 'sdk' }}
+        run: |
+          cd ${{ github.workspace }}
+          unzip ${{ env.ci_target_sdk_name }}
+          mv ./SDK ./SDK-target
+
+      - name: Set up butler
+        if: ${{ env.ci_publish }}
+        uses: jdno/setup-butler@v1
+
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1
+        with:
+          cmake-version: '${{ env.CMAKE_VERSION }}'
+
+      - name: Dependencies
+        shell: bash
+        run: ${{ env.ci_build_script }} dependencies
+
+      - name: Generate
+        shell: bash
+        run: ${{ env.ci_build_script }} generate
+
+      - name: Build
+        shell: bash
+        run: ${{ env.ci_build_script }} build
+
+      - name: Prepare
+        if: ${{ env.ci_publish }}
+        shell: bash
+        run: ${{ env.ci_build_script }} prepare
+
+      - name: Publish
+        if: ${{ env.ci_publish }}
+        run: |
+          butler push "${{ env.ci_build_dir }}/bin/project" "eugeneko/sample-project:windows"

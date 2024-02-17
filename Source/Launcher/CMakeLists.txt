@@ -67,11 +67,3 @@ if (UWP)
         endforeach ()
     endforeach ()
 endif()
-
-# Pass resource path to Win32 project
-if(MSVC AND NOT UWP)
-    set_target_properties(${TARGET_NAME}
-        PROPERTIES
-            VS_DEBUGGER_COMMAND_ARGUMENTS "--pp ${CMAKE_SOURCE_DIR}/Project"
-    )
-endif()
