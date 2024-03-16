@@ -73,3 +73,6 @@ if (WEB)
     web_link_resources(${CMAKE_PROJECT_NAME} Resources.js)
     target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE "--shell-file ${REBELFORK_BIN_DIR}/shell.html")
 endif ()
+
+# Generate Visual Studio props file for csproj.
+rbfx_configure_cmake_props()

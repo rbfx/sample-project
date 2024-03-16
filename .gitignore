@@ -3,6 +3,7 @@
 
 # Ignore generated projects
 build/
+cmake-build/
 .vscode/
 
 # Android output directories
