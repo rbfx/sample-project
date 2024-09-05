@@ -55,7 +55,7 @@ void PlayerController::FixedUpdate(float timeStep)
     const float moveSpeed = 5.0f;
 
     auto input = GetSubsystem<Input>();
-    auto camera = node_->GetComponent<Camera>(true);
+    auto camera = node_->FindComponent<Camera>();
     auto kinematicController = node_->GetComponent<KinematicCharacterController>();
 
     if (!camera || !kinematicController)
@@ -128,7 +128,7 @@ void SampleGameScreen::InitScene()
 
     // Find camera.
     actorNode_ = scene_->FindChild("Actor");
-    Camera* camera = actorNode_ ? actorNode_->GetComponent<Camera>(true) : nullptr;
+    Camera* camera = actorNode_ ? actorNode_->FindComponent<Camera>() : nullptr;
     if (!camera)
         return;
     cameraNode_ = camera->GetNode();
