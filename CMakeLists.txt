@@ -21,6 +21,7 @@ if ("${REBELFORK_SDK}" STREQUAL "")
     # Set path to engine resources.
     set (REBELFORK_BIN_DIR "${CMAKE_SOURCE_DIR}/../rbfx/bin")
     set (REBELFORK_CMAKE_DIR "${CMAKE_SOURCE_DIR}/../rbfx/CMake")
+    set (REBELFORK_SHELL_DIR "${REBELFORK_BIN_DIR}")
 else ()
     # Include pre-built SDK.
     # CMAKE_FIND_ROOT_PATH is required for Web builds because EMSDK ignores CMAKE_PREFIX_PATH by default.
@@ -31,6 +32,7 @@ else ()
     # Set path to engine resources.
     set (REBELFORK_BIN_DIR "${REBELFORK_SDK}/bin")
     set (REBELFORK_CMAKE_DIR "${REBELFORK_SDK}/share/CMake")
+    set (REBELFORK_SHELL_DIR "${REBELFORK_BIN_DIR}/Debug")
 endif ()
 
 # Include common build scripts.
@@ -71,7 +73,7 @@ if (WEB)
         INSTALL_TO   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     )
     web_link_resources(${CMAKE_PROJECT_NAME} Resources.js)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE "--shell-file ${REBELFORK_BIN_DIR}/shell.html")
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE "--shell-file ${REBELFORK_SHELL_DIR}/shell.html")
 endif ()
 
 # Generate Visual Studio props file for csproj.
