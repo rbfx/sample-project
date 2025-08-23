@@ -11,6 +11,32 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
+# Allow user to provide RBFX_DIR as a CMake variable/argument
+set(RBFX_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../rbfx" CACHE PATH "Path to the rbfx repository")
+
+# Always resolve RBFX_DIR to an absolute path
+get_filename_component(RBFX_DIR "${RBFX_DIR}" ABSOLUTE)
+
+# Check if UrhoCommon.cmake exists
+if(NOT EXISTS "${RBFX_DIR}/CMake/Modules/UrhoCommon.cmake")
+    message(FATAL_ERROR
+        "Missing required file: ${RBFX_DIR}/CMake/Modules/UrhoCommon.cmake\n"
+        "It looks like the rbfx repository is not present at the expected location.\n"
+        "Please run the following command to fetch it:\n"
+        "  git clone --recursive https://github.com/rbfx/rbfx.git \"${RBFX_DIR}\"\n"
+    )
+endif()
+
+# Check if Core.SamplePlugin exists
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Core.SamplePlugin/CMakeLists.txt")
+    message(FATAL_ERROR
+        "Missing required file: ${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Core.SamplePlugin/CMakeLists.txt\n"
+        "It looks like git submodules are not initialized.\n"
+        "Please run the following command to fetch them:\n"
+        "  git submodule update --init --recursive\n"
+    )
+endif()
+
 # It is possible to use pre-built SDK or build the Framework from source.
 # In your project, you can choose either option or keep both.
 set (REBELFORK_SDK "" CACHE STRING "Path to pre-built SDK")
