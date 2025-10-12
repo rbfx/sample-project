@@ -11,21 +11,18 @@ set (CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Allow user to provide RBFX_DIR as a CMake variable/argument
-set(RBFX_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../rbfx" CACHE PATH "Path to the rbfx repository")
+# Configure engine options. This is required in-source engine builds.
+set(URHO3D_SAMPLES OFF)
 
-# Always resolve RBFX_DIR to an absolute path
-get_filename_component(RBFX_DIR "${RBFX_DIR}" ABSOLUTE)
-
-# Check if UrhoCommon.cmake exists
-if(NOT EXISTS "${RBFX_DIR}/CMake/Modules/UrhoCommon.cmake")
-    message(FATAL_ERROR
-        "Missing required file: ${RBFX_DIR}/CMake/Modules/UrhoCommon.cmake\n"
-        "It looks like the rbfx repository is not present at the expected location.\n"
-        "Please run the following command to fetch it:\n"
-        "  git clone --recursive https://github.com/rbfx/rbfx.git \"${RBFX_DIR}\"\n"
-    )
-endif()
+# Engine must be available on CMAKE_PREFIX_PATH:
+# Option 1 - prebuilt SDK:
+#   - Download a prebuilt SDK and extract it somewhere
+#   - Configure with `-DCMAKE_PREFIX_PATH=/path/to/your/sdk -DCMAKE_CONFIGURATION_TYPES="Debug;RelWithDebInfo"`
+#     - CMAKE_CONFIGURATION_TYPES may or may not be necessary, depending on your SDK configuration
+# Option 2 - in-source build:
+#   - Clone https://github.com/rbfx/rbfx somewhere
+#   - Configure with `-DCMAKE_PREFIX_PATH=/path/to/rbfx/CMake`
+find_package(Urho3D REQUIRED)
 
 # Check if Core.SamplePlugin exists
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Core.SamplePlugin/CMakeLists.txt")
@@ -36,33 +33,6 @@ if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Core.SamplePlugin/CMakeLists.
         "  git submodule update --init --recursive\n"
     )
 endif()
-
-# It is possible to use pre-built SDK or build the Framework from source.
-# In your project, you can choose either option or keep both.
-set (REBELFORK_SDK "" CACHE STRING "Path to pre-built SDK")
-if ("${REBELFORK_SDK}" STREQUAL "")
-    # Include the Framework to build.
-    add_subdirectory (../rbfx ${CMAKE_BINARY_DIR}/3rdParty/rbfx)
-
-    # Set path to engine resources.
-    set (REBELFORK_BIN_DIR "${CMAKE_SOURCE_DIR}/../rbfx/bin")
-    set (REBELFORK_CMAKE_DIR "${CMAKE_SOURCE_DIR}/../rbfx/CMake")
-    set (REBELFORK_SHELL_DIR "${REBELFORK_BIN_DIR}")
-else ()
-    # Include pre-built SDK.
-    # CMAKE_FIND_ROOT_PATH is required for Web builds because EMSDK ignores CMAKE_PREFIX_PATH by default.
-    set (CMAKE_PREFIX_PATH ${REBELFORK_SDK}/share)
-    list (APPEND CMAKE_FIND_ROOT_PATH ${REBELFORK_SDK}/share)
-    find_package (Urho3D REQUIRED)
-
-    # Set path to engine resources.
-    set (REBELFORK_BIN_DIR "${REBELFORK_SDK}/bin")
-    set (REBELFORK_CMAKE_DIR "${REBELFORK_SDK}/share/CMake")
-    set (REBELFORK_SHELL_DIR "${REBELFORK_BIN_DIR}/Debug")
-endif ()
-
-# Include common build scripts.
-include (${REBELFORK_CMAKE_DIR}/Modules/UrhoCommon.cmake)
 
 # Add plugins (optional).
 include_directories (${CMAKE_SOURCE_DIR}/Plugins)
@@ -84,8 +54,8 @@ add_subdirectory (${CMAKE_SOURCE_DIR}/Source/Launcher)
 
 # Package resources from Project directory.
 if (WEB OR MOBILE)
-    create_pak("${CMAKE_SOURCE_DIR}/Project/Data"   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak")
-    create_pak("${REBELFORK_BIN_DIR}/CoreData"      "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak")
+    create_pak("${CMAKE_SOURCE_DIR}/Project/Data"    "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/Data.pak")
+    create_pak("${Urho3D_PACKAGE_ROOT}/bin/CoreData" "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/CoreData.pak")
 endif ()
 
 # Link resources to Player for Web.
@@ -99,7 +69,7 @@ if (WEB)
         INSTALL_TO   "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}"
     )
     web_link_resources(${CMAKE_PROJECT_NAME} Resources.js)
-    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE "--shell-file ${REBELFORK_SHELL_DIR}/shell.html")
+    target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE "--shell-file ${Urho3D_PACKAGE_ROOT}/bin/shell.html")
 endif ()
 
 # Generate Visual Studio props file for csproj.

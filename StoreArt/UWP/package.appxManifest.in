@@ -7,7 +7,7 @@
 	<Identity Name="@PROJECT_UWP_GUID@" Publisher="CN=CMake" Version="1.0.0.0" />
 	<mp:PhoneIdentity PhoneProductId="@PROJECT_UWP_GUID@" PhonePublisherId="00000000-0000-0000-0000-000000000000"/>
 	<Properties>
-		<DisplayName>@CMAKE_PROJECT_NAME@Launcher</DisplayName>
+		<DisplayName>@CMAKE_PROJECT_NAME@</DisplayName>
 		<PublisherDisplayName>@CMAKE_PROJECT_NAME@</PublisherDisplayName>
 		<Logo>Assets\StoreLogo.png</Logo>
 	</Properties>
@@ -18,10 +18,10 @@
 		<Resource Language="x-generate" />
 	</Resources>
 	<Applications>
-		<Application Id="App" Executable="@CMAKE_PROJECT_NAME@Launcher.exe" EntryPoint="@CMAKE_PROJECT_NAME@Launcher.App">
+		<Application Id="App" Executable="@CMAKE_PROJECT_NAME@.exe" EntryPoint="@CMAKE_PROJECT_NAME@.App">
 			<uap:VisualElements
-				DisplayName="SampleProjectLauncher"
-				Description="SampleProjectLauncher"
+				DisplayName="@CMAKE_PROJECT_NAME@"
+				Description="@CMAKE_PROJECT_NAME@"
 				BackgroundColor="#336699"
 				Square150x150Logo="Assets\Logo.png"
 				Square44x44Logo="Assets\SmallLogo44x44.png">
