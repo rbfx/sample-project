@@ -10,9 +10,11 @@ TODO: Expand this page and the sample.
 
 Checkout and build this project like any other CMake project.
 
-Make sure that checked out `rbfx` folder is next to the folder of this repository (`sample-project` or however you call it).
-
-If you want to keep `rbfx` folder somewhere else, you will have to tweak `../rbfx` paths in `./CMakeLists.txt`.
+Provide `rbfx`:
+- Build engine: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx/CMake`
+- Use engine SDK:
+  - Windows: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx-SDK/share`
+  - Unix: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx-SDK`
 
 Check out `Scripts/` folder and `.github/workflows/deploy.yml` to see how this sample can be built.
 
