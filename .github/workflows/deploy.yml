@@ -15,7 +15,7 @@ on:
 
 env:
   # Common settings.
-  CMAKE_VERSION: 3.21.x
+  CMAKE_VERSION: 3.24.x
   # Common paths.
   ci_source_dir: ${{ github.workspace }}/source-code
   ci_build_script: ./source-code/Script/ci_build.sh

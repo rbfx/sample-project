@@ -40,6 +40,7 @@ function action-generate() {
         "-S"
         "$ci_source_dir"
     )
+    CMAKE_PREFIX_PATH='CMAKE_PREFIX_PATH'
     if [[ "$ci_platform" == "web" ]]; then
         params+=(
             "-G"
@@ -48,10 +49,10 @@ function action-generate() {
             "-DEMSCRIPTEN_ROOT_PATH=$EMSDK/upstream/emscripten/"
             "-DCMAKE_BUILD_WITH_INSTALL_RPATH=ON"
             "-DBUILD_SHARED_LIBS=OFF"
-            "-DURHO3D_SDK=$ci_native_sdk_dir"
             "-DCI_WEB_BUILD=ON"
             "-DCMAKE_BUILD_TYPE=Release"
         )
+        CMAKE_PREFIX_PATH='CMAKE_FIND_ROOT_PATH'
     elif [[ "$ci_platform" == "windows" ]]; then
         params+=(
             "-G"
@@ -63,9 +64,14 @@ function action-generate() {
     fi
 
     if [[ $ci_build_mode == "sdk" ]]; then
-        params+=("-DREBELFORK_SDK=$ci_target_sdk_dir")
+        params+=("-D$CMAKE_PREFIX_PATH=$ci_target_sdk_dir;$ci_native_sdk_dir")
+    else
+        # Subdirectory mode: point to engine CMake directory
+        local engine_path="$ci_source_dir/../rbfx"
+        params+=("-D$CMAKE_PREFIX_PATH=$engine_path/CMake;$ci_native_sdk_dir")
     fi
 
+    echo "cmake ${params[@]}"
     cmake "${params[@]}"
 }
 
