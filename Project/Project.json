@@ -10,6 +10,7 @@
 	"PluginManager": {
 		"LoadedPlugins": [
 			"Plugin.Core.SamplePlugin",
+			"Plugin.Core.SteamAudio",
 			"App.Main"
 		]
 	}

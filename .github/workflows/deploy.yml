@@ -16,6 +16,7 @@ on:
 env:
   # Common settings.
   CMAKE_VERSION: 3.24.x
+  ci_steam_audio_version: 4.7.0
   # Common paths.
   ci_source_dir: ${{ github.workspace }}/source-code
   ci_build_script: ./source-code/Script/ci_build.sh
@@ -37,7 +38,7 @@ jobs:
   # Build the project for Web using both engine SDK and engine in subdirectory.
   # SDK build is published to itch.io.
   Web:
-    if: github.event.pull_request.draft == false
+    if: false
     runs-on: ubuntu-latest
     needs: [CheckSkipCI]
 
@@ -189,6 +190,18 @@ jobs:
           cd ${{ github.workspace }}
           unzip ${{ env.ci_target_sdk_name }}
           mv ./SDK ./SDK-target
+
+      - name: Download Steam Audio SDK
+        uses: robinraju/release-downloader@v1.8
+        with:
+          repository: ValveSoftware/steam-audio
+          tag: v${{ env.ci_steam_audio_version }}
+          fileName: steamaudio_${{ env.ci_steam_audio_version }}.zip
+
+      - name: Unzip Steam Audio SDK
+        run: |
+          cd ${{ github.workspace }}
+          unzip steamaudio_${{ env.ci_steam_audio_version }}.zip
 
       - name: Set up butler
         if: ${{ env.ci_publish }}

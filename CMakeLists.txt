@@ -37,10 +37,11 @@ endif()
 # Add plugins (optional).
 include_directories (${CMAKE_SOURCE_DIR}/Plugins)
 add_subdirectory (${CMAKE_SOURCE_DIR}/Plugins/Core.SamplePlugin)
+add_subdirectory (${CMAKE_SOURCE_DIR}/Plugins/Core.SteamAudio)
 
 # List all plugins used by the application.
 set (APP_PLUGIN_NAME "App.Main")
-set (APP_PLUGIN_LIST "Plugin.Core.SamplePlugin;${APP_PLUGIN_NAME}")
+set (APP_PLUGIN_LIST "Plugin.Core.SamplePlugin;Plugin.Core.SteamAudio;${APP_PLUGIN_NAME}")
 
 # Add main application library with all user code.
 add_subdirectory (${CMAKE_SOURCE_DIR}/Source/Application)

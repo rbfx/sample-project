@@ -1,3 +1,9 @@
 [submodule "Plugins/Core.SamplePlugin"]
 	path = Plugins/Core.SamplePlugin
 	url = https://github.com/rbfx/Core.SamplePlugin.git
+	branch = master
+
+[submodule "Plugins/Core.SteamAudio"]
+	path = Plugins/Core.SteamAudio
+	url = https://github.com/rbfx/Core.SteamAudio.git
+	branch = master
