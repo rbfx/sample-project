@@ -15,13 +15,17 @@ on:
 
 env:
   # Common settings.
-  CMAKE_VERSION: 3.24.x
+  CMAKE_VERSION: 3.25.x
   # Common paths.
   ci_source_dir: ${{ github.workspace }}/source-code
   ci_build_script: ./source-code/Script/ci_build.sh
   ci_build_dir: ${{ github.workspace }}/cmake-build
   ci_native_sdk_dir: ${{ github.workspace }}/SDK-native
   ci_target_sdk_dir: ${{ github.workspace }}/SDK-target
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
   CheckSkipCI:
@@ -50,8 +54,8 @@ jobs:
 
     env:
       ci_platform: web
-      ci_native_sdk_name: rebelfork-sdk-Linux-clang-dll-x64-latest.zip
-      ci_target_sdk_name: rebelfork-sdk-Web-lib-latest.zip
+      ci_native_sdk_name: rebelfork-sdk-linux-clang-x64-dll-latest
+      ci_target_sdk_name: rebelfork-sdk-web-emscripten-wasm-lib-latest
       ci_emsdk_version: latest
       ci_build_mode: ${{ matrix.ci_build_mode }}
       ci_publish: ${{ github.ref == 'refs/heads/master' && github.repository == 'rbfx/sample-project' && matrix.ci_build_mode == 'sdk'}}
@@ -83,13 +87,13 @@ jobs:
         with:
           repository: rbfx/rbfx
           tag: latest
-          fileName: ${{ env.ci_native_sdk_name }}
+          fileName: ${{ env.ci_native_sdk_name }}.7z
 
       - name: Unzip native SDK
         run: |
-          cd ${{ github.workspace }}
-          unzip ${{ env.ci_native_sdk_name }}
-          mv ./SDK ./SDK-native
+          cd '${{ github.workspace }}'
+          7z x '${{ env.ci_native_sdk_name }}.7z' '-o${{ github.workspace }}' -y
+          mv './${{ env.ci_native_sdk_name }}' ./SDK-native
 
       - name: Download target SDK
         if: ${{ matrix.ci_build_mode == 'sdk' }}
@@ -97,14 +101,14 @@ jobs:
         with:
           repository: rbfx/rbfx
           tag: latest
-          fileName: ${{ env.ci_target_sdk_name }}
+          fileName: ${{ env.ci_target_sdk_name }}.7z
 
       - name: Unzip target SDK
         if: ${{ matrix.ci_build_mode == 'sdk' }}
         run: |
-          cd ${{ github.workspace }}
-          unzip ${{ env.ci_target_sdk_name }}
-          mv ./SDK ./SDK-target
+          cd '${{ github.workspace }}'
+          7z x '${{ env.ci_target_sdk_name }}.7z' '-o${{ github.workspace }}' -y
+          mv './${{ env.ci_target_sdk_name }}' ./SDK-target
 
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v1.8
@@ -153,7 +157,7 @@ jobs:
 
     env:
       ci_platform: windows
-      ci_target_sdk_name: rebelfork-sdk-Windows-msvc-dll-x64-latest.zip
+      ci_target_sdk_name: rebelfork-sdk-windows-msvc-x64-lib-latest
       ci_build_mode: ${{ matrix.ci_build_mode }}
       ci_publish: ${{ github.ref == 'refs/heads/master' && github.repository == 'rbfx/sample-project' && matrix.ci_build_mode == 'sdk'}}
       BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
@@ -181,14 +185,14 @@ jobs:
         with:
           repository: rbfx/rbfx
           tag: latest
-          fileName: ${{ env.ci_target_sdk_name }}
+          fileName: ${{ env.ci_target_sdk_name }}.7z
 
       - name: Unzip target SDK
         if: ${{ matrix.ci_build_mode == 'sdk' }}
         run: |
-          cd ${{ github.workspace }}
-          unzip ${{ env.ci_target_sdk_name }}
-          mv ./SDK ./SDK-target
+          cd '${{ github.workspace }}'
+          7z x '${{ env.ci_target_sdk_name }}.7z' '-o${{ github.workspace }}' -y
+          mv './${{ env.ci_target_sdk_name }}' ./SDK-target
 
       - name: Set up butler
         if: ${{ env.ci_publish }}
