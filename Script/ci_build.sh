@@ -27,7 +27,7 @@ declare -A build_config=(
 
 function action-dependencies() {
     if [[ "$ci_platform" == "web" ]]; then
-        sudo apt-get install -y --no-install-recommends uuid-dev ninja-build
+        sudo apt-get install -y --no-install-recommends uuid-dev ninja-build libopengl0
     elif [[ "$ci_platform" == "windows" ]]; then
         : # No dependencies
     fi
