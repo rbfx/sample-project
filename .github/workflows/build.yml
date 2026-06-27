@@ -9,24 +9,52 @@ on:
   workflow_dispatch:
 
 jobs:
-  CheckSkipCI:
+  PrepareMatrix:
+    name: Prepare Matrix
     runs-on: ubuntu-latest
-    if: |
-      !contains(github.event.head_commit.message, '[skip ci]') &&
-      !contains(github.event.pull_request.title, '[skip ci]') &&
-      !contains(github.event.head_commit.message, '[skip-ci]') &&
-      !contains(github.event.pull_request.title, '[skip-ci]')
+    outputs:
+      platform_matrix: ${{ steps.prepare.outputs.platform_matrix }}
+      deploy_artifact_tags: ${{ steps.prepare.outputs.deploy_artifact_tags }}
     steps:
-      - run: exit 0
+      - name: Prepare rbfx matrix
+        id: prepare
+        uses: rokups/rbfx-temp/.github/actions/ci-prepare-matrix@rk/ci-reusable-workflow2
+        with:
+          android_gradle_dir: android
+          deploy_artifacts: 'windows-msvc-x64-lib,web-emscripten-wasm-lib'
 
   Build:
-    if: github.event.pull_request.draft == false
-    needs: [CheckSkipCI]
-    uses: rokups/rbfx-temp/.github/workflows/project-ci.yml@rk/ci-reusable-workflow
-    secrets: inherit
-    with:
-      rbfx_source_repository: rokups/rbfx-temp
-      rbfx_source_ref: rk/ci-reusable-workflow
-      android_gradle_dir: android
-      deploy_artifacts: 'windows-msvc-x64-lib,web-emscripten-wasm-lib'
-      artifact_name_prefix: sample-project-build
+    name: ${{ matrix.ci_platform_tag }}
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    needs: [PrepareMatrix]
+    runs-on: ${{ matrix.runs_on }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.PrepareMatrix.outputs.platform_matrix) }}
+
+    steps:
+      - name: Prepare rbfx environment
+        id: rbfx
+        uses: rokups/rbfx-temp/.github/actions/ci-prepare-platform@rk/ci-reusable-workflow2
+        with:
+          profile: downstream
+          ci_platform_tag: ${{ matrix.ci_platform_tag }}
+          rbfx_source_repository: rokups/rbfx-temp
+          rbfx_source_ref: rk/ci-reusable-workflow2
+
+      - name: Build sample project
+        uses: rokups/rbfx-temp/.github/actions/ci-build-project@rk/ci-reusable-workflow2
+        with:
+          android_gradle_dir: android
+          sdk_cached: ${{ steps.rbfx.outputs.sdk_cached }}
+          source_sdk_thirdparty_used: ${{ steps.rbfx.outputs.source_sdk_thirdparty_used }}
+          build_cache_hit: ${{ steps.rbfx.outputs.build_cache_hit }}
+
+      - name: Publish selected artifacts
+        if: contains(fromJSON(needs.PrepareMatrix.outputs.deploy_artifact_tags), matrix.ci_platform_tag)
+        uses: rokups/rbfx-temp/.github/actions/ci-publish-project-artifacts@rk/ci-reusable-workflow2
+        with:
+          upload_artifact: 'true'
+          artifact_name: sample-project-build-${{ matrix.ci_platform_tag }}
+          android_gradle_dir: android
