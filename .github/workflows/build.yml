@@ -21,7 +21,8 @@ jobs:
         uses: rokups/rbfx-temp/.github/actions/ci-prepare-matrix@rk/ci-reusable-workflow2
         with:
           android_gradle_dir: android
-          deploy_artifacts: 'windows-msvc-x64-lib,web-emscripten-wasm-lib'
+          deploy_artifacts: 'windows,linux,macos,web'
+          host_context: 'true'
 
   Build:
     name: ${{ matrix.ci_platform_tag }}
@@ -42,6 +43,13 @@ jobs:
           ci_platform_tag: ${{ matrix.ci_platform_tag }}
           rbfx_source_repository: rokups/rbfx-temp
           rbfx_source_ref: rk/ci-reusable-workflow2
+
+      - name: Install host context
+        if: ${{ matrix.host_context_enabled }}
+        uses: rokups/rbfx-temp/.github/actions/ci-install-host-context@rk/ci-reusable-workflow2
+        with:
+          enabled: ${{ matrix.host_context_enabled && 'true' || 'false' }}
+          host_platform_tag: ${{ matrix.host_platform_tag }}
 
       - name: Build sample project
         uses: rokups/rbfx-temp/.github/actions/ci-build-project@rk/ci-reusable-workflow2
