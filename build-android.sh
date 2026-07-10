@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Build script for Android project using RebelFork SDK and Docker
+# Build script for Android project using RebelFork SDK and custom Docker image
 
 set -e  # Exit on any error
 
@@ -20,9 +20,9 @@ rm -rf rebelfork-sdk-android*
 # Download RebelFork Android SDK
 echo "Downloading RebelFork Android SDK..."
 if command -v wget >/dev/null 2>&1; then
-    wget https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-x64-dll-latest.7z -O rebelfork-sdk-android.7z
-elif command -v curl >/dev/null 2>&1; then
-    curl -L https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-x64-dll-latest.7z -o rebelfork-sdk-android.7z
+    wget https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-arm64-dll-latest.7z -O rebelfork-sdk-android.7z
+ elif command -v curl >/dev/null 2>&1; then
+    curl -L https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-arm64-dll-latest.7z -o rebelfork-sdk-android.7z
 else
     echo "Error: Neither wget nor curl is available. Please install one of them."
     exit 1
@@ -48,31 +48,59 @@ if ! command -v docker >/dev/null 2>&1; then
     exit 1
 fi
 
-# Pull the Docker image
-echo "Pulling Docker image..."
-docker pull mobiledevops/android-sdk-image:36.1.0
+# Pass SDK path to gradle
+export SDK_PATH="${PWD}/${SDK_DIR}"
 
-# Build using Docker
-echo "Building Android project with Docker..."
+# Create Gradle wrapper with the correct version
+echo "Setting up Gradle wrapper..."
+mkdir -p android/gradle/wrapper
+cat > android/gradle/wrapper/gradle-wrapper.properties << 'EOF'
+distributionBase=GRADLE_USER_HOME
+distributionPath=wrapper/dists
+distributionUrl=https\://services.gradle.org/distributions/gradle-7.3.3-bin.zip
+zipStoreBase=GRADLE_USER_HOME
+zipStorePath=wrapper/dists
+EOF
+
+# Initialize git submodules if they exist
+if [ -f ".gitmodules" ]; then
+    echo "Initializing git submodules..."
+    git submodule sync
+    git submodule update --init --recursive
+fi
+
+# Create 3rdParty/rbfx directory (needs rbfx source for SDL Java files)
+echo "Setting up rbfx source directory..."
+mkdir -p 3rdParty
+if [ ! -d "3rdParty/rbfx" ]; then
+    echo "Cloning rbfx source repository..."
+    git clone --depth 1 https://github.com/rbfx/rbfx.git 3rdParty/rbfx
+fi
+
+# Build using our custom Docker image with Gradle wrapper
+echo "Building Android project with custom Docker image..."
 docker run --rm \
   -v "$PWD:/workspace" \
   -w /workspace \
-  mobiledevops/android-sdk-image:36.1.0 \
+  rbfx-android-builder \
   bash -c "
     set -e
     echo '=== Inside Docker container ==='
     echo 'Current directory:' \$PWD
-    echo 'Listing files:'
+    echo 'Listing files top-level:'
     ls -la
     
-    # Try to build using Gradle
-    if [ -f 'android/gradlew' ]; then
-      echo 'Using Gradle wrapper...'
-      cd android && chmod +x gradlew && ./gradlew assembleDebug
-    else
-      echo 'Using system Gradle...'
-      cd android && gradle assembleDebug
-    fi
+    echo 'Checking 3rdParty/rbfx:'
+    ls 3rdParty/rbfx/Source/ThirdParty/SDL/android-project/app/src/main/java/ 2>/dev/null || echo 'SDL Java dir missing'
+    
+    cd android
+    
+    # Make gradlew executable
+    chmod +x gradlew
+    
+    # Build using Gradle wrapper (already configured with Gradle 7.3.3)
+    echo 'Building with Gradle wrapper (Gradle 7.3.3)...'
+    ./gradlew assembleDebug
     
     echo 'Build completed!'
     echo 'APK files found:'
