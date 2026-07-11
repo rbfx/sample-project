@@ -20,9 +20,9 @@ rm -rf rebelfork-sdk-android*
 # Download RebelFork Android SDK
 echo "Downloading RebelFork Android SDK..."
 if command -v wget >/dev/null 2>&1; then
-    wget https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-arm64-dll-latest.7z -O rebelfork-sdk-android.7z
+    wget https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-x64-dll-latest.7z -O rebelfork-sdk-android.7z
  elif command -v curl >/dev/null 2>&1; then
-    curl -L https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-arm64-dll-latest.7z -o rebelfork-sdk-android.7z
+    curl -L https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-x64-dll-latest.7z -o rebelfork-sdk-android.7z
 else
     echo "Error: Neither wget nor curl is available. Please install one of them."
     exit 1
