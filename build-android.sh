@@ -59,8 +59,7 @@ docker run --rm \
   bash -c "
     set -e
     cd android
-    chmod +x gradlew
-    ./gradlew assembleDebug
+    gradle assembleDebug
   "
 
 # Report
