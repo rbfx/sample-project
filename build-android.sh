@@ -35,6 +35,10 @@ if ! command -v docker >/dev/null 2>&1; then
     exit 1
 fi
 
+# Build Docker image
+echo "Building Docker image..."
+docker build -t rbfx-android-builder-slim .
+
 # Submodules
 if [ -f ".gitmodules" ]; then
     git submodule sync
