@@ -16,7 +16,7 @@ Provide `rbfx`:
   - Windows: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx-SDK/share`
   - Unix: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx-SDK`
 
-Check out `Scripts/` folder and `.github/workflows/deploy.yml` to see how this sample can be built.
+Check out `.github/workflows/build.yml` and `.github/workflows/deploy.yml` to see how this sample is built and how deployment reuses build artifacts without recompiling.
 
 ## Running the Sample
 

@@ -12,7 +12,15 @@ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Configure engine options. This is required in-source engine builds.
-set(URHO3D_SAMPLES OFF)
+set (URHO3D_PHYSICS ON)
+set (URHO3D_PLAYER ON)
+set (URHO3D_RMLUI ON)
+set (URHO3D_EDITOR ON)
+set (URHO3D_FILEWATCHER ON)
+set (URHO3D_HASH_DEBUG ON)
+set (URHO3D_LOGGING ON)
+set (URHO3D_SYSTEMUI ON)
+set (URHO3D_PLUGINS ON)
 
 # Engine must be available on CMAKE_PREFIX_PATH:
 # Option 1 - prebuilt SDK:
