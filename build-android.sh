@@ -45,11 +45,6 @@ if [ -f ".gitmodules" ]; then
     git submodule update --init --recursive
 fi
 
-# rbfx source for SDL Java files
-if [ ! -d "3rdParty/rbfx" ]; then
-    git clone --depth 1 https://github.com/rbfx/rbfx.git 3rdParty/rbfx
-fi
-
 # Build
 echo "Building..."
 docker run --rm \

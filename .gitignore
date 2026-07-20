@@ -19,9 +19,8 @@ android/.cxx
 # Ignore log files
 Urho3D.log
 
-# Ignore SDK and 3rd party directories
+# Ignore SDK directories
 rebelfork-sdk-*
-3rdParty/
 
 # Ignore temp files
 *.jar

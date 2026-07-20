@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 // Relative path to engine source code directory. Modify as required.
 def projectSourceDir = '..'
 // Relative path to engine source code directory. Modify as required.
-def rbfxSourceDir = '../3rdParty/rbfx'
+def sdkPath = '../rebelfork-sdk-android-clang-x64-dll-latest'
 // Minimum required CMake version. This is same as in ../CMakeLists.txt.
 def cmakeSdkPath = '"$projectDir/../../../rebelfork-sdk-android-clang-x64-dll-latest"'
 def cmakeVersion = '3.22.0.0+'
@@ -56,7 +56,7 @@ android {
     }
     sourceSets.main {
         manifest.srcFile 'AndroidManifest.xml'
-        java.srcDirs = ['src', "${rbfxSourceDir}/Source/ThirdParty/SDL/android-project/app/src/main/java"]
+        java.srcDirs = ['src', "${sdkPath}/share/Urho3D/Android/java"]
         res.srcDirs = ['res', "${projectSourceDir}/StoreArt/Android/Icons"]
         assets.srcDirs = ['assets', "${projectSourceDir}/Project"]
     }
