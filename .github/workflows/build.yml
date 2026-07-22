@@ -43,7 +43,7 @@ jobs:
         uses: rokups/rbfx-temp/.github/actions/ci-prepare-platform@rk/ci-reusable-workflow3
         with:
           profile: downstream
-          framework_source: https://github.com/rokups/rbfx-temp.git
+          framework_source: https://github.com/rokups/rbfx-temp.git#rk/ci-reusable-workflow3
           framework_build_type: sdk
           host_artifact_names: |
             sample-project-build-${{ matrix.ci_host_platform_tag }}
