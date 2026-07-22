@@ -35,6 +35,7 @@ jobs:
       - name: Checkout sample project
         uses: actions/checkout@v5
         with:
+          path: source-code
           fetch-depth: 1
           submodules: recursive
 
@@ -43,7 +44,8 @@ jobs:
         uses: rokups/rbfx-temp/.github/actions/ci-prepare-platform@rk/ci-reusable-workflow3
         with:
           profile: downstream
-          framework_source: https://github.com/rokups/rbfx-temp.git#rk/ci-reusable-workflow3
+          project_dir: source-code
+          framework_source: https://github.com/rokups/rbfx-temp.git
           framework_build_type: sdk
           host_artifact_names: |
             sample-project-build-${{ matrix.ci_host_platform_tag }}
@@ -52,5 +54,6 @@ jobs:
       - name: Build sample project
         uses: rokups/rbfx-temp/.github/actions/ci-build-project@rk/ci-reusable-workflow3
         with:
+          project_dir: source-code
           android_dir: android
           artifact_name: sample-project-build-${{ matrix.ci_platform_tag }}
