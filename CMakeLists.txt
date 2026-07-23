@@ -82,3 +82,20 @@ endif ()
 
 # Generate Visual Studio props file for csproj.
 rbfx_configure_cmake_props()
+
+# Install the project outputs consumed by CI artifact uploads and host-side
+# cross-build steps. The engine/SDK remains a separate caller-provided prefix.
+foreach (TARGET
+    ${CMAKE_PROJECT_NAME}
+    ${CMAKE_PROJECT_NAME}Editor
+    ${APP_PLUGIN_NAME}
+    Plugin.Core.SamplePlugin)
+    if (TARGET ${TARGET})
+        install(TARGETS ${TARGET}
+            RUNTIME DESTINATION bin/$<CONFIG>
+            LIBRARY DESTINATION bin/$<CONFIG>
+            ARCHIVE DESTINATION lib/$<CONFIG>
+            BUNDLE DESTINATION bin/$<CONFIG>)
+    endif ()
+endforeach ()
+install(DIRECTORY "${CMAKE_SOURCE_DIR}/Project/" DESTINATION share/${CMAKE_PROJECT_NAME})
