@@ -12,25 +12,37 @@ Checkout and build this project like any other CMake project.
 
 Provide `rbfx`:
 - Build engine: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx/CMake`
-- Use engine SDK:
-  - Windows: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx-SDK/share`
-  - Unix: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx-SDK`
+- Use engine SDK: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx-SDK`
 
 Check out `.github/workflows/build.yml` and `.github/workflows/deploy.yml` to see how this sample is built and how deployment reuses build artifacts without recompiling.
 
-The build workflow demonstrates both supported CI framework inputs. Set the
+The build workflow demonstrates explicit framework and artifact I/O. Set the
 `RBFX_FRAMEWORK_BUILD_TYPE` repository variable to `sdk` (the default) or `source`:
 
-- `sdk` downloads the platform SDK archive in the workflow and passes its local path
-  through `framework_sdk`.
-- `source` checks out the configured engine ref in the workflow and passes the local
-  engine directory through `framework_source`.
+- `sdk` downloads and extracts the platform SDK in the workflow.
+- `source` checks out the configured engine ref in the workflow.
 
 `RBFX_REPOSITORY`, `RBFX_REF`, and `RBFX_RELEASE` repository variables select the
 engine repository, source ref, and SDK release. Checkout and download steps have
 mutually exclusive conditions, so only the configured framework variant is acquired.
-The preparation action validates only the input selected by
-`RBFX_FRAMEWORK_BUILD_TYPE`.
+
+Native and cross-target builds share one matrix and the same build steps. Host
+acquisition is skipped entirely for native rows. Cross SDK builds download and
+extract the native rbfx SDK. Cross source builds instead invoke
+`ci-wait-for-build` and download the native project install—which also contains the
+source-built engine binaries. These paths are
+mutually exclusive, so SDK downloads happen only in SDK mode and project-artifact
+waiting and downloading happen only in source mode. Each SDK is extracted once by
+the workflow and may be reused by multiple action invocations in the job.
+
+The preparation action receives one ordered `cmake_prefix_path` list containing all
+possible target and native prefixes. It ignores paths not produced by the selected
+workflow mode. The same list is exported as `CMAKE_PREFIX_PATH`, or as
+`CMAKE_FIND_ROOT_PATH` for Web. The preparation action itself never waits for jobs,
+downloads artifacts, or distinguishes source trees from SDKs.
+
+The workflow uploads the CMake install directory directly, except Android, which
+uploads the Gradle `build/outputs` directory exposed by the build action.
 
 ## Running the Sample
 
