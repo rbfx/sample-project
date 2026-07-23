@@ -8,6 +8,13 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  # Select `sdk` or `source` with the RBFX_FRAMEWORK_BUILD_TYPE repository variable.
+  RBFX_FRAMEWORK_BUILD_TYPE: ${{ vars.RBFX_FRAMEWORK_BUILD_TYPE || 'sdk' }}
+  RBFX_REPOSITORY: ${{ vars.RBFX_REPOSITORY || 'rokups/rbfx-temp' }}
+  RBFX_REF: ${{ vars.RBFX_REF || 'rk/ci-reusable-workflow3' }}
+  RBFX_RELEASE: ${{ vars.RBFX_RELEASE || 'latest' }}
+
 jobs:
   PrepareMatrix:
     name: Prepare Matrix
@@ -39,17 +46,40 @@ jobs:
           fetch-depth: 1
           submodules: recursive
 
+      - name: Checkout rbfx engine source
+        if: env.RBFX_FRAMEWORK_BUILD_TYPE == 'source'
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ env.RBFX_REPOSITORY }}
+          ref: ${{ env.RBFX_REF }}
+          path: framework/rbfx
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Download rbfx SDK
+        if: env.RBFX_FRAMEWORK_BUILD_TYPE == 'sdk'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SDK_ASSET: rebelfork-sdk-${{ matrix.ci_platform_tag }}-latest.7z
+        run: |
+          mkdir -p "${GITHUB_WORKSPACE}/framework"
+          gh release download "$RBFX_RELEASE" \
+            --repo "$RBFX_REPOSITORY" \
+            --pattern "$SDK_ASSET" \
+            --dir "${GITHUB_WORKSPACE}/framework"
+
       - name: Prepare rbfx environment
         id: rbfx
         uses: rokups/rbfx-temp/.github/actions/ci-prepare-platform@rk/ci-reusable-workflow3
         with:
           profile: downstream
           project_dir: source-code
-          framework_source: https://github.com/rokups/rbfx-temp.git
-          framework_build_type: sdk
+          framework_build_type: ${{ env.RBFX_FRAMEWORK_BUILD_TYPE }}
+          framework_source: framework/rbfx
+          framework_sdk: framework/rebelfork-sdk-${{ matrix.ci_platform_tag }}-latest.7z
           host_artifact_names: |
             sample-project-build-${{ matrix.ci_host_platform_tag }}
-            rebelfork-sdk-${{ matrix.ci_host_platform }}-${{ matrix.ci_host_compiler }}-${{ matrix.ci_host_arch }}-dll-latest.7z
 
       - name: Build sample project
         uses: rokups/rbfx-temp/.github/actions/ci-build-project@rk/ci-reusable-workflow3

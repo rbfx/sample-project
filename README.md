@@ -1,6 +1,6 @@
 # Sample project
 
-Simple example project that uses [the Framework](https://github.com/rbfx/rbfx) as submodule.
+Simple example project that uses [the Framework](https://github.com/rbfx/rbfx).
 
 It is automatically deployed to [itch.io](https://eugeneko.itch.io/sample-project) and it can be played in browser.
 
@@ -17,6 +17,20 @@ Provide `rbfx`:
   - Unix: provide `-DCMAKE_PREFIX_PATH=/path/to/rbfx-SDK`
 
 Check out `.github/workflows/build.yml` and `.github/workflows/deploy.yml` to see how this sample is built and how deployment reuses build artifacts without recompiling.
+
+The build workflow demonstrates both supported CI framework inputs. Set the
+`RBFX_FRAMEWORK_BUILD_TYPE` repository variable to `sdk` (the default) or `source`:
+
+- `sdk` downloads the platform SDK archive in the workflow and passes its local path
+  through `framework_sdk`.
+- `source` checks out the configured engine ref in the workflow and passes the local
+  engine directory through `framework_source`.
+
+`RBFX_REPOSITORY`, `RBFX_REF`, and `RBFX_RELEASE` repository variables select the
+engine repository, source ref, and SDK release. Checkout and download steps have
+mutually exclusive conditions, so only the configured framework variant is acquired.
+The preparation action validates only the input selected by
+`RBFX_FRAMEWORK_BUILD_TYPE`.
 
 ## Running the Sample
 
