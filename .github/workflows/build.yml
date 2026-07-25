@@ -24,7 +24,9 @@ jobs:
     steps:
       - name: Prepare rbfx matrix
         id: prepare
-        uses: rokups/rbfx-temp/.github/actions/ci-prepare-matrix@rk/ci-reusable-workflow3
+        uses: rbfx/ci/.github/actions/ci-prepare-matrix@master
+        with:
+          platforms: all
 
   Build:
     name: ${{ matrix.ci_platform_tag }}
@@ -97,7 +99,7 @@ jobs:
         if: >-
           env.RBFX_FRAMEWORK_BUILD_TYPE == 'source' &&
           matrix.ci_platform_tag != matrix.ci_host_platform_tag
-        uses: rokups/rbfx-temp/.github/actions/ci-wait-for-build@rk/ci-reusable-workflow3
+        uses: rbfx/ci/.github/actions/ci-wait-for-build@master
         with:
           job_name: ${{ matrix.ci_host_platform_tag }}
           artifact_names: |
@@ -113,7 +115,7 @@ jobs:
           path: host-project
 
       - name: Prepare rbfx environment
-        uses: rokups/rbfx-temp/.github/actions/ci-prepare-platform@rk/ci-reusable-workflow3
+        uses: rbfx/ci/.github/actions/ci-prepare-platform@master
         with:
           profile: downstream
           project_dir: source-code
@@ -125,25 +127,16 @@ jobs:
 
       - name: Build and install sample project
         id: build
-        uses: rokups/rbfx-temp/.github/actions/ci-build-project@rk/ci-reusable-workflow3
+        uses: rbfx/ci/.github/actions/ci-build-project@master
         with:
           project_dir: source-code
           build_dir: project-build/${{ matrix.ci_platform_tag }}
           install_dir: project-install/${{ matrix.ci_platform_tag }}
           android_dir: android
 
-      - name: Upload CMake project install
-        if: ${{ !startsWith(matrix.ci_platform_tag, 'android-') }}
+      - name: Upload project install
         uses: actions/upload-artifact@v7
         with:
           name: sample-project-build-${{ matrix.ci_platform_tag }}
           path: ${{ steps.build.outputs.install_dir }}
-          if-no-files-found: error
-
-      - name: Upload Android Gradle outputs
-        if: ${{ startsWith(matrix.ci_platform_tag, 'android-') }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: sample-project-build-${{ matrix.ci_platform_tag }}
-          path: ${{ steps.build.outputs.android_output_dir }}
           if-no-files-found: error
