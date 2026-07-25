@@ -26,7 +26,7 @@ jobs:
         id: prepare
         uses: rbfx/ci/.github/actions/ci-prepare-matrix@master
         with:
-          platforms: all
+          platforms: 'windows-dbg,android-x64-rel'
 
   Build:
     name: ${{ matrix.ci_platform_tag }}
