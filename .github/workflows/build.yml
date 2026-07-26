@@ -20,7 +20,7 @@ jobs:
     name: Prepare Matrix
     runs-on: ubuntu-latest
     outputs:
-      platform_matrix: ${{ steps.prepare.outputs.platform_matrix }}
+      matrix: ${{ steps.prepare.outputs.matrix }}
     steps:
       - name: Prepare rbfx matrix
         id: prepare
@@ -29,14 +29,14 @@ jobs:
           platforms: all
 
   Build:
-    name: ${{ matrix.ci_platform_tag }}
+    name: ${{ matrix.ci_job_name }}
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     needs: [PrepareMatrix]
     runs-on: ${{ matrix.runs_on }}
 
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.PrepareMatrix.outputs.platform_matrix) }}
+      matrix: ${{ fromJSON(needs.PrepareMatrix.outputs.matrix) }}
 
     steps:
       - name: Checkout sample project
@@ -101,9 +101,9 @@ jobs:
           matrix.ci_platform_tag != matrix.ci_host_platform_tag
         uses: rbfx/ci/.github/actions/ci-wait-for-build@master
         with:
-          job_name: ${{ matrix.ci_host_platform_tag }}
+          job_name: ${{ matrix.ci_host_job_name }}
           artifact_names: |
-            sample-project-build-${{ matrix.ci_host_platform_tag }}
+            sample-project-build-${{ matrix.ci_host_job_name }}
 
       - name: Download native project install
         if: >-
@@ -118,7 +118,6 @@ jobs:
         uses: rbfx/ci/.github/actions/ci-prepare-platform@master
         with:
           profile: downstream
-          project_dir: source-code
           cmake_prefix_path: |
             host-project
             framework/rbfx/CMake
@@ -137,6 +136,6 @@ jobs:
       - name: Upload project install
         uses: actions/upload-artifact@v7
         with:
-          name: sample-project-build-${{ matrix.ci_platform_tag }}
+          name: sample-project-build-${{ matrix.ci_job_name }}
           path: ${{ steps.build.outputs.install_dir }}
           if-no-files-found: error
