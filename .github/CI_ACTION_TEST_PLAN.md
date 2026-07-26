@@ -1,17 +1,17 @@
 # CI action branch test plan
 
-All scenario branches start from `rk/ci-reusable-workflow4`. SDK scenarios force
-`RBFX_FRAMEWORK_BUILD_TYPE=sdk`; they use the repository, release, and credentials
-already configured for the sample-project repository.
+All scenario branches start from `rk/ci-reusable-workflow4`. SDK scenarios use the
+repository, release, and credentials already configured for the sample-project
+repository.
 
 | Branch | Expected jobs | Purpose |
 |---|---:|---|
 | `rk/ci-test-sdk-all-grouped` | 1 planner + 20 builds | All supported platform tags, canonical build types, grouped sequential builds, runner/host mapping, multiline prefixes, explicit project/build/install/Android paths |
 | `rk/ci-test-sdk-split-custom` | 1 planner + 4 builds | `separate_build_types=true`, custom short names, qualified Android Gradle tasks, one-entry matrix build maps, unique target/host job names |
 | `rk/ci-test-sdk-selectors` | 1 planner + 2 builds | Platform-family selection, `@build-type` selection, exclusions, grouped one-entry maps |
-| `rk/ci-test-sdk-direct-defaults` | 1 build | No matrix action, explicit platform input, JSON prefix list, canonical build-project defaults, default build directory, disabled non-Android installation |
+| `rk/ci-test-sdk-direct-defaults` | 1 build | No matrix action, explicit platform input, multiline prefix list, canonical build-project defaults, default build directory, disabled non-Android installation |
 | `rk/ci-test-sdk-explicit-override` | 1 planner + 1 build | Explicit build-project map overriding the matrix map, custom build/install paths, typed and untyped CMake cache variables |
-| `rk/ci-test-wait-options` | 1 producer + 1 waiter | Exact job-name polling, JSON artifact-name input, explicit timeout/grace/token, ordered artifact IDs, caller-owned downloads |
+| `rk/ci-test-wait-options` | 1 producer + 1 waiter | Exact job-name polling, multiline artifact-name input, explicit timeout/grace/token, ordered artifact IDs, caller-owned downloads |
 | `rk/ci-test-source-smoke` | 1 planner + 1 build | One native Linux Debug source build; deliberately the only engine-source compilation in this suite |
 
 ## Coverage by action
@@ -29,7 +29,7 @@ already configured for the sample-project repository.
 
 - Matrix-derived and explicit `ci_platform_tag`
 - `profile=downstream`
-- Multiline and JSON `cmake_prefix_path`
+- Multiline `cmake_prefix_path`
 - Native and cross-platform SDK layouts
 - Source-tree prefix in the single source smoke scenario
 
@@ -49,7 +49,7 @@ composition.
 
 ### ci-wait-for-build
 
-- `job_name`, JSON `artifact_names`, `timeout_seconds`,
+- `job_name`, multiline `artifact_names`, `timeout_seconds`,
   `artifact_grace_seconds`, and explicit `token`
 - Two artifacts to verify input/output ordering and caller-owned download
 
