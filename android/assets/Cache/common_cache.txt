@@ -1,0 +1,1 @@
+When editor import files it will place assets in the Cache folder.

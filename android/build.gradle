@@ -2,9 +2,10 @@ apply plugin: 'com.android.application'
 
 // Relative path to engine source code directory. Modify as required.
 def projectSourceDir = '..'
-// Relative path to project source code directory. Modify as required.
-def rbfxSourceDir = '../3rdParty/rbfx'
+// Relative path to engine source code directory. Modify as required.
+def sdkPath = '../rebelfork-sdk-android-clang-arm64-dll-latest'
 // Minimum required CMake version. This is same as in ../CMakeLists.txt.
+def cmakeSdkPath = '"$projectDir/../../../rebelfork-sdk-android-clang-arm64-dll-latest"'
 def cmakeVersion = '3.22.0.0+'
 
 buildscript {
@@ -28,12 +29,15 @@ android {
         minSdkVersion 17
         targetSdkVersion 32
         ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+            abiFilters 'arm64-v8a'
         }
         externalNativeBuild {
             cmake {
-                arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-21', '-DANDROID=1',
-                          '-DANDROID_ARM_MODE=arm', '-DBUILD_SHARED_LIBS=OFF'
+                arguments '-DANDROID_STL=c++_shared', '-DANDROID_PLATFORM=android-21', '-DANDROID=1',
+                          '-DANDROID_ARM_MODE=arm', '-DBUILD_SHARED_LIBS=ON',
+                          '-DCMAKE_PREFIX_PATH=' + new File(projectDir, '../rebelfork-sdk-android-clang-arm64-dll-latest/share').absolutePath,
+                          '-DUrho3D_DIR=' + new File(projectDir, '../rebelfork-sdk-android-clang-arm64-dll-latest/share/Urho3D/CMake').absolutePath,
+                          '-DPACKAGE_TOOL_EXECUTABLE=python3 ' + new File(projectDir, '../rebelfork-sdk-android-clang-arm64-dll-latest/bin/PackageTool.py').absolutePath
             }
         }
     }
@@ -52,7 +56,7 @@ android {
     }
     sourceSets.main {
         manifest.srcFile 'AndroidManifest.xml'
-        java.srcDirs = ['src', "${rbfxSourceDir}/Source/ThirdParty/SDL/android-project/app/src/main/java"]
+        java.srcDirs = ['src', "${sdkPath}/share/Urho3D/Android/java"]
         res.srcDirs = ['res', "${projectSourceDir}/StoreArt/Android/Icons"]
         assets.srcDirs = ['assets', "${projectSourceDir}/Project"]
     }

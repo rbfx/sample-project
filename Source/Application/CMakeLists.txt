@@ -1,8 +1,12 @@
 # Include source files.
 file (GLOB_RECURSE SOURCE_FILES *.h *.cpp)
 
-# Add dynamic or static library.
-add_library (${APP_PLUGIN_NAME} ${SOURCE_FILES})
+if (ANDROID)
+    add_library(${APP_PLUGIN_NAME} STATIC ${SOURCE_FILES})
+    target_compile_definitions(${APP_PLUGIN_NAME} PRIVATE URHO3D_STATIC=1)
+else()
+    add_library(${APP_PLUGIN_NAME} ${SOURCE_FILES})
+endif ()
 
 # Link the engine and dependencies.
 target_link_libraries (${APP_PLUGIN_NAME} PRIVATE
