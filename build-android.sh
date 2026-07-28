@@ -10,14 +10,14 @@ if [ ! -f "CMakeLists.txt" ] || [ ! -d "android" ]; then
 fi
 
 # Download SDK only if not already extracted
-SDK_DIR="rebelfork-sdk-android-clang-x64-dll-latest"
+SDK_DIR="rebelfork-sdk-android-clang-arm64-dll-latest"
 if [ ! -d "$SDK_DIR" ]; then
     echo "Downloading SDK..."
-    rm -f rebelfork-sdk-android-clang-x64-dll-latest.7z
+    rm -f rebelfork-sdk-android-clang-arm64-dll-latest.7z
     if command -v wget >/dev/null 2>&1; then
-        wget -q https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-x64-dll-latest.7z -O rebelfork-sdk-android.7z
+        wget -q https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-arm64-dll-latest.7z -O rebelfork-sdk-android.7z
     elif command -v curl >/dev/null 2>&1; then
-        curl -sL https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-x64-dll-latest.7z -o rebelfork-sdk-android.7z
+        curl -sL https://github.com/rbfx/rbfx/releases/download/latest/rebelfork-sdk-android-clang-arm64-dll-latest.7z -o rebelfork-sdk-android.7z
     else
         echo "Error: wget or curl required"
         exit 1
@@ -29,29 +29,8 @@ else
     echo "SDK already present, skipping download"
 fi
 
-# Patch SDK with missing SDL Java sources (not packaged in released SDK)
-SDL_SRC="../rbfx/Source/ThirdParty/SDL/android-project/app/src/main/java"
-SDL_DST="$SDK_DIR/share/Urho3D/Android/java"
-if [ -d "$SDL_SRC" ]; then
-    for java_file in \
-        org/libsdl/app/SDLActivity.java \
-        org/libsdl/app/SDL.java \
-        org/libsdl/app/SDLAudioManager.java \
-        org/libsdl/app/SDLControllerManager.java \
-        org/libsdl/app/HIDDevice.java \
-        org/libsdl/app/HIDDeviceManager.java \
-        org/libsdl/app/HIDDeviceBLESteamController.java \
-        org/libsdl/app/HIDDeviceUSB.java; do
-        if [ ! -f "$SDK_DIR/share/Urho3D/Android/java/$java_file" ]; then
-            mkdir -p "$SDL_DST/$(dirname "$java_file")"
-            cp "$SDL_SRC/$java_file" "$SDL_DST/$java_file"
-            echo "Patched: $java_file"
-        fi
-    done
-    echo "SDL Java sources patched into SDK"
-else
-    echo "Warning: $SDL_SRC not found, SDL Java patch skipped"
-fi
+# Add coredata (should this be part of the SDK?)
+cp -r ../rbfx/bin/CoreData Project/
 
 # Docker
 if ! command -v docker >/dev/null 2>&1; then
