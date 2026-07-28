@@ -7,21 +7,11 @@ cmake-build/
 .vscode/
 
 # Android output directories
+gradle*
 .gradle
 .idea
 android/.cxx
 
-# But don't ignore Gradle wrapper files
-!android/gradlew
-!android/gradlew.bat
-!android/gradle/
-
 # Ignore log files
 Urho3D.log
-
-# Ignore SDK directories
-rebelfork-sdk-*
-
-# Ignore temp files
-*.jar
 
