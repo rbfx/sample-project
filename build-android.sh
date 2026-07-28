@@ -58,6 +58,7 @@ docker run --rm \
     set -e
     cd android
     gradle assembleDebug
+    chown -R $(id -u):$(id -g) /workspace
   "
 
 # Report
