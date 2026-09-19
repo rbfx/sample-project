@@ -3,9 +3,11 @@ apply plugin: 'com.android.application'
 // Relative path to engine source code directory. Modify as required.
 def projectSourceDir = '..'
 // Relative path to project source code directory. Modify as required.
-def rbfxSourceDir = '../3rdParty/rbfx'
+def rbfxSourceDir = file('../rbfx').exists() ? '../rbfx' : '../3rdParty/rbfx'
+// SDL Android Java glue is exported by rbfx CI for both source and SDK builds.
+def rbfxAndroidJavaDir = System.getenv('RBFX_ANDROID_JAVA_DIR') ?: "${rbfxSourceDir}/Source/ThirdParty/SDL/android-project/app/src/main/java"
 // Minimum required CMake version. This is same as in ../CMakeLists.txt.
-def cmakeVersion = '3.22.0.0+'
+def cmakeVersion = '3.25.0+'
 
 buildscript {
     repositories {
@@ -13,27 +15,51 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.2.1'
+        classpath 'com.android.tools.build:gradle:8.13.0'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }
 }
 
 android {
-    compileSdkVersion 32
+    namespace 'io.urho3d'
+    compileSdkVersion 35
     defaultConfig {
         applicationId 'io.urho3d'
         versionCode 1
         versionName '1.0.0'
-        minSdkVersion 17
-        targetSdkVersion 32
+        minSdkVersion 24
+        targetSdkVersion 35
         ndk {
-            abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+            def targetArch = System.getenv('ci_arch')
+            if (targetArch) {
+                def archMap = [
+                    'arm': 'armeabi-v7a',
+                    'arm64': 'arm64-v8a',
+                    'x86': 'x86',
+                    'x64': 'x86_64'
+                ]
+                def androidAbi = archMap.get(targetArch, targetArch)
+                abiFilters androidAbi
+            } else {
+                abiFilters 'armeabi-v7a', 'arm64-v8a', 'x86_64'
+            }
         }
         externalNativeBuild {
             cmake {
+                def buildSharedLibs = System.getenv('ci_lib_type') != 'lib'
                 arguments '-DANDROID_STL=c++_static', '-DANDROID_PLATFORM=android-21', '-DANDROID=1',
-                          '-DANDROID_ARM_MODE=arm', '-DBUILD_SHARED_LIBS=OFF'
+                          '-DANDROID_ARM_MODE=arm', "-DBUILD_SHARED_LIBS=${buildSharedLibs ? 'ON' : 'OFF'}"
+
+                def cmakePrefixPath = System.getenv('CMAKE_PREFIX_PATH')
+                if (cmakePrefixPath) {
+                    arguments "-DCMAKE_PREFIX_PATH=${cmakePrefixPath}"
+                }
+
+                def urho3dDir = System.getenv('Urho3D_DIR')
+                if (urho3dDir) {
+                    arguments "-DUrho3D_DIR=${urho3dDir}"
+                }
             }
         }
     }
@@ -46,13 +72,13 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt')
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
 
         }
     }
     sourceSets.main {
         manifest.srcFile 'AndroidManifest.xml'
-        java.srcDirs = ['src', "${rbfxSourceDir}/Source/ThirdParty/SDL/android-project/app/src/main/java"]
+        java.srcDirs = ['src', rbfxAndroidJavaDir]
         res.srcDirs = ['res', "${projectSourceDir}/StoreArt/Android/Icons"]
         assets.srcDirs = ['assets', "${projectSourceDir}/Project"]
     }
