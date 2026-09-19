@@ -1,0 +1,141 @@
+name: Build
+
+on:
+  push:
+    branches-ignore:
+      - 'no-ci-**'
+      - 'skip-ci-**'
+  pull_request:
+  workflow_dispatch:
+
+env:
+  # Select `sdk` or `source` with the RBFX_FRAMEWORK_BUILD_TYPE repository variable.
+  RBFX_FRAMEWORK_BUILD_TYPE: ${{ vars.RBFX_FRAMEWORK_BUILD_TYPE || 'sdk' }}
+  RBFX_REPOSITORY: ${{ vars.RBFX_REPOSITORY || 'rbfx/rbfx' }}
+  RBFX_REF: ${{ vars.RBFX_REF || 'master' }}
+  RBFX_RELEASE: ${{ vars.RBFX_RELEASE || 'latest' }}
+
+jobs:
+  PrepareMatrix:
+    name: Prepare Matrix
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.prepare.outputs.matrix }}
+    steps:
+      - name: Prepare rbfx matrix
+        id: prepare
+        uses: rbfx/ci/.github/actions/ci-prepare-matrix@v1
+        with:
+          platforms: all
+
+  Build:
+    name: ${{ matrix.ci_job_name }}
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    needs: [PrepareMatrix]
+    runs-on: ${{ matrix.runs_on }}
+
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.PrepareMatrix.outputs.matrix) }}
+
+    steps:
+      - name: Checkout sample project
+        uses: actions/checkout@v5
+        with:
+          path: source-code
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Checkout target rbfx engine source
+        if: env.RBFX_FRAMEWORK_BUILD_TYPE == 'source'
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ env.RBFX_REPOSITORY }}
+          ref: ${{ env.RBFX_REF }}
+          path: framework/rbfx
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Download target rbfx SDK
+        if: env.RBFX_FRAMEWORK_BUILD_TYPE == 'sdk'
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SDK_ASSET: rebelfork-sdk-${{ matrix.ci_platform_tag }}-latest.7z
+        run: |
+          mkdir -p \
+            "${GITHUB_WORKSPACE}/framework" \
+            "${GITHUB_WORKSPACE}/framework/target-sdk"
+          gh release download "$RBFX_RELEASE" \
+            --repo "$RBFX_REPOSITORY" \
+            --pattern "$SDK_ASSET" \
+            --dir "${GITHUB_WORKSPACE}/framework"
+          7z x -y \
+            "${GITHUB_WORKSPACE}/framework/${SDK_ASSET}" \
+            -o"${GITHUB_WORKSPACE}/framework/target-sdk"
+
+      - name: Download native rbfx SDK for cross-build tools
+        if: >-
+          env.RBFX_FRAMEWORK_BUILD_TYPE == 'sdk' &&
+          matrix.ci_platform_tag != matrix.ci_host_platform_tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SDK_ASSET: rebelfork-sdk-${{ matrix.ci_host_platform_tag }}-latest.7z
+        run: |
+          mkdir -p \
+            "${GITHUB_WORKSPACE}/framework/host" \
+            "${GITHUB_WORKSPACE}/framework/host-sdk"
+          gh release download "$RBFX_RELEASE" \
+            --repo "$RBFX_REPOSITORY" \
+            --pattern "$SDK_ASSET" \
+            --dir "${GITHUB_WORKSPACE}/framework/host"
+          7z x -y \
+            "${GITHUB_WORKSPACE}/framework/host/${SDK_ASSET}" \
+            -o"${GITHUB_WORKSPACE}/framework/host-sdk"
+
+      - name: Wait for native project build
+        id: host_project
+        if: >-
+          env.RBFX_FRAMEWORK_BUILD_TYPE == 'source' &&
+          matrix.ci_platform_tag != matrix.ci_host_platform_tag
+        uses: rbfx/ci/.github/actions/ci-wait-for-build@v1
+        with:
+          job_name: ${{ matrix.ci_host_job_name }}
+          artifact_names: |
+            sample-project-build-${{ matrix.ci_host_job_name }}
+
+      - name: Download native project install
+        if: >-
+          env.RBFX_FRAMEWORK_BUILD_TYPE == 'source' &&
+          matrix.ci_platform_tag != matrix.ci_host_platform_tag
+        uses: actions/download-artifact@v5
+        with:
+          artifact-ids: ${{ steps.host_project.outputs.artifact_ids }}
+          path: host-project
+
+      - name: Prepare rbfx environment
+        uses: rbfx/ci/.github/actions/ci-prepare-platform@v1
+        with:
+          profile: downstream
+          cmake_prefix_path: |
+            host-project
+            framework/rbfx/CMake
+            framework/target-sdk/rebelfork-sdk-${{ matrix.ci_platform_tag }}-latest
+            framework/host-sdk/rebelfork-sdk-${{ matrix.ci_host_platform_tag }}-latest
+
+      - name: Build and install sample project
+        id: build
+        uses: rbfx/ci/.github/actions/ci-build-project@v1
+        with:
+          project_dir: source-code
+          build_dir: project-build/${{ matrix.ci_platform_tag }}
+          install_dir: project-install/${{ matrix.ci_platform_tag }}
+          android_dir: android
+
+      - name: Upload project install
+        uses: actions/upload-artifact@v7
+        with:
+          name: sample-project-build-${{ matrix.ci_job_name }}
+          path: ${{ steps.build.outputs.install_dir }}
+          if-no-files-found: error

@@ -1,6 +1,6 @@
 # Sample project
 
-Simple example project that uses [the Framework](https://github.com/rbfx/rbfx) as submodule.
+Simple example project that uses [the Framework](https://github.com/rbfx/rbfx).
 
 It is automatically deployed to [itch.io](https://eugeneko.itch.io/sample-project) and it can be played in browser.
 
