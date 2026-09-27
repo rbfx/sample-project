@@ -101,8 +101,8 @@ void SampleProject::Start(bool isMain)
         stateManager->SetFadeInDuration(0.2f);
         stateManager->SetFadeOutDuration(0.2f);
         loadingScreen_ = MakeShared<SplashScreen>(context_);
-        loadingScreen_->SetMouseMode(MM_RELATIVE);
-        loadingScreen_->SetMouseVisible(false);
+        loadingScreen_->SetMouseMode(MM_ABSOLUTE);
+        loadingScreen_->SetMouseVisible(true);
         loadingScreen_->QueueSceneResourcesAsync("Scenes/Scene.xml");
         loadingScreen_->SetProgressColor(Color::WHITE);
         loadingScreen_->SetDefaultFogColor(Color::GRAY);
