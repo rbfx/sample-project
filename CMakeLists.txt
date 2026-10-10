@@ -23,6 +23,8 @@ set(URHO3D_SAMPLES OFF)
 #   - Clone https://github.com/rbfx/rbfx somewhere
 #   - Configure with `-DCMAKE_PREFIX_PATH=/path/to/rbfx/CMake`
 find_package(Urho3D REQUIRED)
+# The C# bindings are optional. They are a separate package: https://github.com/rbfx/rbfx-csharp
+find_package(Urho3DNet QUIET)
 
 # Check if Core.SamplePlugin exists
 if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/Plugins/Core.SamplePlugin/CMakeLists.txt")
@@ -73,7 +75,9 @@ if (WEB)
 endif ()
 
 # Generate Visual Studio props file for csproj.
-rbfx_configure_cmake_props()
+if (COMMAND rbfx_configure_cmake_props)
+    rbfx_configure_cmake_props()
+endif ()
 
 # Install the project outputs consumed by CI artifact uploads and host-side
 # cross-build steps. The engine/SDK remains a separate caller-provided prefix.
