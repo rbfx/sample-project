@@ -148,7 +148,9 @@ jobs:
           install="${GITHUB_WORKSPACE}/${{ steps.build.outputs.install_dir }}"
           [[ -d "$install" ]] || install="${{ steps.build.outputs.install_dir }}"
           # Prefer the optimized configuration. A Debug package needs the debug CRT, which is not redistributable.
-          config="$(basename "$(ls -d "$install"/bin/RelWithDebInfo/ "$install"/bin/Release/ "$install"/bin/*/ 2>/dev/null | head -1)")"
+          config=""
+          for c in RelWithDebInfo Release; do [[ -d "$install/bin/$c" ]] && { config=$c; break; }; done
+          [[ -n "$config" ]] || config="$(basename "$(ls -d "$install"/bin/*/ | head -1)")"
           sdk="${GITHUB_WORKSPACE}/framework/target-sdk/rebelfork-sdk-${{ matrix.ci_platform_tag }}-latest"
           [[ -d "$sdk" ]] || sdk="${GITHUB_WORKSPACE}/framework/rbfx"
           source-code/Script/package_dist.sh "$install/bin/$config" "$sdk" "$config" \
