@@ -140,6 +140,37 @@ jobs:
           path: ${{ steps.build.outputs.install_dir }}
           if-no-files-found: error
 
+      # Runnable package for the user. Android uploads the collected apk output.
+      - name: Package runnable project
+        if: env.ci_platform == 'windows' || env.ci_platform == 'linux' || env.ci_platform == 'macos'
+        shell: bash
+        run: |
+          install="${GITHUB_WORKSPACE}/${{ steps.build.outputs.install_dir }}"
+          [[ -d "$install" ]] || install="${{ steps.build.outputs.install_dir }}"
+          config="$(basename "$(ls -d "$install"/bin/*/ | head -1)")"
+          sdk="${GITHUB_WORKSPACE}/framework/target-sdk/rebelfork-sdk-${{ matrix.ci_platform_tag }}-latest"
+          [[ -d "$sdk" ]] || sdk="${GITHUB_WORKSPACE}/framework/rbfx"
+          source-code/Script/package_dist.sh "$install/bin/$config" "$sdk" "$config" \
+            "$install/share/SampleProject/Data" dist
+
+      - name: Upload runnable project
+        if: env.ci_platform == 'windows' || env.ci_platform == 'linux' || env.ci_platform == 'macos'
+        uses: actions/upload-artifact@v7
+        with:
+          name: sample-project-${{ matrix.ci_job_name }}
+          path: dist
+          retention-days: 7
+          if-no-files-found: error
+
+      - name: Upload Android package
+        if: env.ci_platform == 'android'
+        uses: actions/upload-artifact@v7
+        with:
+          name: sample-project-${{ matrix.ci_job_name }}
+          path: ${{ steps.build.outputs.install_dir }}/android
+          retention-days: 7
+          if-no-files-found: error
+
   # Build with the C# bindings SDK and compile the managed assembly of the plugin.
   Linux-CSharp:
     name: Linux-CSharp
@@ -218,3 +249,17 @@ jobs:
           count="$(nm -D --defined-only cmake-build/bin/libPlugin.Core.SamplePlugin.so | grep -c CSharp_ || true)"
           echo "CSharp_ exports: ${count}"
           test "${count}" -gt 0
+
+      - name: Package runnable project
+        run: |
+          sdk="${GITHUB_WORKSPACE}/sdk/rebelfork-sdk-linux-gcc-x64-dll-latest"
+          source-code/Script/package_dist.sh cmake-build/bin "$sdk" RelWithDebInfo \
+            source-code/Project/Data dist
+
+      - name: Upload runnable project
+        uses: actions/upload-artifact@v7
+        with:
+          name: sample-project-linux-csharp
+          path: dist
+          retention-days: 7
+          if-no-files-found: error
