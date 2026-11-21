@@ -139,3 +139,82 @@ jobs:
           name: sample-project-build-${{ matrix.ci_job_name }}
           path: ${{ steps.build.outputs.install_dir }}
           if-no-files-found: error
+
+  # Build with the C# bindings SDK and compile the managed assembly of the plugin.
+  Linux-CSharp:
+    name: Linux-CSharp
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
+    env:
+      CSHARP_REPOSITORY: ${{ vars.CSHARP_REPOSITORY || 'rbfx/csharp-swig' }}
+      DOTNET_NOLOGO: '1'
+      DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+        with:
+          path: source-code
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Install system packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            ninja-build p7zip-full \
+            libgl1-mesa-dev libxcursor-dev libxi-dev libxinerama-dev \
+            libxrandr-dev libxrender-dev libxss-dev libasound2-dev \
+            libpulse-dev libibus-1.0-dev libdbus-1-dev libreadline6-dev \
+            libudev-dev uuid-dev libtbb-dev libxcb-glx0-dev
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '8.0'
+
+      - name: Download engine and C# SDKs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p sdk-download sdk
+          gh release download latest \
+            --repo "${{ vars.RBFX_REPOSITORY || 'rbfx/rbfx' }}" \
+            --pattern 'rebelfork-sdk-linux-gcc-x64-dll-latest.7z' \
+            --dir sdk-download
+          gh release download latest \
+            --repo "$CSHARP_REPOSITORY" \
+            --pattern 'rebelfork-csharp-sdk-linux-gcc-x64-dll-latest.7z' \
+            --dir sdk-download
+          for f in sdk-download/*.7z; do 7z x -y "$f" -o"sdk" >/dev/null; done
+
+      - name: Configure
+        run: |
+          engine="${GITHUB_WORKSPACE}/sdk/rebelfork-sdk-linux-gcc-x64-dll-latest"
+          csharp="${GITHUB_WORKSPACE}/sdk/rebelfork-csharp-sdk-linux-gcc-x64-dll-latest"
+          cmake \
+            -S source-code \
+            -B cmake-build \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DBUILD_SHARED_LIBS=ON \
+            "-DCMAKE_PREFIX_PATH=${engine}/share;${csharp}/share" \
+            "-DUrho3DNet_DIR=${csharp}/share/Urho3DNet"
+
+      - name: Build
+        run: cmake --build cmake-build -j
+
+      - name: Build managed plugin assembly
+        run: |
+          dotnet build source-code/Plugins/Core.SamplePlugin/CSharp/Plugin.csproj \
+            -c RelWithDebInfo \
+            -p:CMAKE_BINARY_DIR="${GITHUB_WORKSPACE}/cmake-build/"
+
+      - name: Check outputs
+        run: |
+          test -f cmake-build/bin/RelWithDebInfo/Plugin.Core.SamplePlugin.Net.dll
+          count="$(nm -D --defined-only cmake-build/bin/libPlugin.Core.SamplePlugin.so | grep -c CSharp_ || true)"
+          echo "CSharp_ exports: ${count}"
+          test "${count}" -gt 0
